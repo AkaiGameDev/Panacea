@@ -11,6 +11,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Camera/CameraComponent.h"  // Ensure this is included
 #include "Item.h"
+#include "GeometryCollection/GeometryCollectionComponent.h" 
 
 UInteractiveComponent::UInteractiveComponent()
 {
@@ -359,6 +360,10 @@ AActor* UInteractiveComponent::GetClosestToOwner(const TArray<AActor*>& ActorsTo
 
 			FCollisionQueryParams QueryParams;
 			QueryParams.AddIgnoredActor(Owner);
+
+			UGeometryCollectionComponent* GeometryCollection = InteractableActor->GetComponentByClass<UGeometryCollectionComponent>();
+			if (GeometryCollection)
+				QueryParams.AddIgnoredComponent(GeometryCollection);
 
 			// Perform the line trace
 			bool bHit = GetWorld()->LineTraceSingleByChannel(

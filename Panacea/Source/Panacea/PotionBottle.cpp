@@ -116,7 +116,7 @@ void APotionBottle::OnComponentReleased(UPrimitiveComponent* ReleasedComponent)
 	StaticMeshComponent->GetLocalBounds(Origin, BoxBounds);
 	FVector ActorScale = StaticMeshComponent->GetComponentScale();
 	FVector BoxExtent = BoxBounds * ActorScale; 
-
+	BoxExtent.Z /= 2.0f;
 	FCollisionShape Box = FCollisionShape::MakeBox(BoxExtent);
 	FHitResult HitResult;
 
@@ -168,6 +168,14 @@ void APotionBottle::Interact()
 	if (SwitchComponent)
 	{
 		SwitchComponent->SwitchCamera();
+	}
+
+	ACharacter* Character = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+	UInteractiveComponent* InteractiveComponent = Character->GetComponentByClass<UInteractiveComponent>();
+
+	if (InteractiveComponent)
+	{
+		InteractiveComponent->bIsHolding = !InteractiveComponent->bIsHolding;
 	}
 
 	FirstInteraction();

@@ -27,7 +27,7 @@ void APhilosophersStoneActor::BeginPlay()
 	InitialLocation = GetActorLocation();
 	StoneMeshComponent->SetVisibility(false);
 
-	Enable();
+	//Enable();
 }
 
 // Called every frame
