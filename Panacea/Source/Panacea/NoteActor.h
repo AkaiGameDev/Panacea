@@ -5,6 +5,7 @@
 #include "NoteWidget.h"
 #include "GameFramework/Actor.h"
 #include "Blueprint/UserWidget.h"
+#include "PanaceaCharacter.h"
 #include "GameFramework/PlayerController.h"
 #include "NoteActor.generated.h"
 
@@ -27,20 +28,19 @@ public:
 	UPROPERTY()
 	UNoteWidget* NoteWidget = nullptr;
 
-
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 
 	UPROPERTY()
-	ACharacter* PlayerCharacter;
+	APanaceaCharacter* PlayerCharacter;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	bool bOpened = false;
 
-
+	UPROPERTY()
+	UInputMappingContext* CharacterDefaultMappingContext;
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -50,6 +50,4 @@ public:
 	void CloseNote();
 
 	void OpenNote();
-
-
 };

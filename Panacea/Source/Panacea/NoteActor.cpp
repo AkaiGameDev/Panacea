@@ -1,4 +1,6 @@
 #include "NoteActor.h"
+
+#include "EnhancedInputSubsystems.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/TextBlock.h"
 #include "GameFramework/Character.h"
@@ -19,11 +21,13 @@ void ANoteActor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	PlayerCharacter = UGameplayStatics::GetPlayerCharacter(this, 0);
+	PlayerCharacter = Cast<APanaceaCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
 	if (!PlayerCharacter)
 	{
 		UE_LOG(LogTemp, Error, TEXT("PlayerCharacter is not found in note actor."));
+		return;
 	}
+	CharacterDefaultMappingContext = PlayerCharacter->GetDefaultMappingContext();
 }
 
 void ANoteActor::Interact()
@@ -67,8 +71,11 @@ void ANoteActor::CloseNote()
 		PlayerController->bShowMouseCursor = false;
 	}
 
-	// Enable player movement
-	PlayerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+
+	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+	{
+		Subsystem->AddMappingContext(CharacterDefaultMappingContext, 0);
+	}
 
 	Broadcast();
 	bOpened = false;
@@ -123,7 +130,10 @@ void ANoteActor::OpenNote()
 	// Disable player movement
 	if (PlayerCharacter)
 	{
-		PlayerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+		{
+			Subsystem->RemoveMappingContext(CharacterDefaultMappingContext);
+		}
 	}
 	else
 	{
