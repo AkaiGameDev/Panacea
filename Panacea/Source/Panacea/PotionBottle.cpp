@@ -77,7 +77,7 @@ void APotionBottle::OnComponentFracture(const FChaosBreakEvent& BreakEvent)
 				
 				if(SpawnedActor)
 				{
-					SpawnedActor->SetActorLabel("Amber");
+					SpawnedActor->Rename(TEXT("Amber"));
 
 					UStaticMeshComponent* MeshComponent = SpawnedActor->FindComponentByClass<UStaticMeshComponent>();
 					if (MeshComponent)
