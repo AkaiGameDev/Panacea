@@ -21,7 +21,7 @@ ACrossActor::ACrossActor()
 	SwitchComponent = CreateDefaultSubobject<USwitchComponent>(TEXT("SwitchComponent"));
 	SwitchComponent->SetupAttachment(RootComponent);
 
-	MinimumDegrees = 100.0f;
+	MinimumDegrees = 120.0f;
 }
 
 void ACrossActor::BeginPlay()
