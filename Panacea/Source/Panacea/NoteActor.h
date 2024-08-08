@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Item.h"
+#include "NoteWidget.h"
 #include "GameFramework/Actor.h"
 #include "Blueprint/UserWidget.h"
 #include "GameFramework/PlayerController.h"
@@ -24,7 +25,7 @@ public:
 	FString NoteText;
 
 	UPROPERTY()
-	UUserWidget* PauseMenuWidget = nullptr;
+	UNoteWidget* NoteWidget = nullptr;
 
 
 
@@ -32,12 +33,14 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	bool bOpened = false;
 
 	UPROPERTY()
 	ACharacter* PlayerCharacter;
 
-	static TArray<ANoteActor*> NoteActors;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	bool bOpened = false;
+
+
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -48,11 +51,5 @@ public:
 
 	void OpenNote();
 
-
-	UFUNCTION(BlueprintCallable, Category = "Note")
-	static ANoteActor* FindOpenedNoteActor();
-
-
-	bool IsOpened();
 
 };

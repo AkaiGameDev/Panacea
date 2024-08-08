@@ -4,7 +4,6 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
-TArray<ANoteActor*> ANoteActor::NoteActors;
 
 // Sets default values
 ANoteActor::ANoteActor()
@@ -12,8 +11,6 @@ ANoteActor::ANoteActor()
 	// Set this actor to call Tick() every frame. You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	Interactable = true;
-
-	NoteActors.Add(this);
 }
 
 
@@ -46,7 +43,7 @@ void ANoteActor::Interact()
 
 void ANoteActor::CloseNote()
 {
-	if (!PauseMenuWidget)
+	if (!NoteWidget)
 	{
 		UE_LOG(LogTemp, Error, TEXT("PauseMenuWidget is not initialized"));
 		return;
@@ -58,8 +55,8 @@ void ANoteActor::CloseNote()
 		return;
 	}
 
-	PauseMenuWidget->RemoveFromParent();
-	PauseMenuWidget = nullptr;
+	NoteWidget->RemoveFromParent();
+	NoteWidget = nullptr;
 	UE_LOG(LogTemp, Warning, TEXT("Pause Menu Removed"));
 
 	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
@@ -73,8 +70,8 @@ void ANoteActor::CloseNote()
 	// Enable player movement
 	PlayerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 
-	bOpened = false;
 	Broadcast();
+	bOpened = false;
 }
 
 void ANoteActor::OpenNote()
@@ -94,18 +91,19 @@ void ANoteActor::OpenNote()
 	}
 
 	// Create the pause menu widget
-	PauseMenuWidget = CreateWidget<UUserWidget>(PlayerController, PauseMenuWidgetClass);
-	if (!PauseMenuWidget)
+	NoteWidget = CreateWidget<UNoteWidget>(PlayerController, PauseMenuWidgetClass);
+	if (!NoteWidget)
 	{
 		UE_LOG(LogTemp, Error, TEXT("PauseMenuWidget could not be created."));
 		return;
 	}
 
+	NoteWidget->SetNoteActor(this);
 	// Add the widget to the viewport
-	PauseMenuWidget->AddToViewport();
+	NoteWidget->AddToViewport();
 
 	//get text from the note
-	UTextBlock* TextBlock = Cast<UTextBlock>(PauseMenuWidget->GetWidgetFromName(TEXT("Content")));
+	UTextBlock* TextBlock = Cast<UTextBlock>(NoteWidget->GetWidgetFromName(TEXT("Content")));
 	if (TextBlock)
 	{
 		TextBlock->SetText(FText::FromString(NoteText));
@@ -133,30 +131,4 @@ void ANoteActor::OpenNote()
 	}
 
 	bOpened = true;
-}
-
-ANoteActor* ANoteActor::FindOpenedNoteActor()
-{
-	ANoteActor* OpenedNoteActor = nullptr;
-
-	for (auto note : NoteActors)
-	{
-		if (note->IsOpened())
-		{
-			OpenedNoteActor = note;
-			break;
-		}
-	}
-
-	if (OpenedNoteActor == nullptr)
-	{
-		UE_LOG(LogTemp, Error, TEXT("OpenedNoteActor is not found."));
-	}
-	return OpenedNoteActor;
-}
-
-
-bool ANoteActor::IsOpened()
-{
-	return bOpened;
 }
