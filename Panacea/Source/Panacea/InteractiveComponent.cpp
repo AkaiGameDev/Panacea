@@ -74,6 +74,7 @@ void UInteractiveComponent::BeginPlay()
 	if (HintInteractionWidget)
 	{
 		HintInteractionWidget->SetVisibility(ESlateVisibility::Hidden);
+		//get text component
 	}
 	else
 	{
@@ -131,6 +132,10 @@ void UInteractiveComponent::OnOverlapBegin(UPrimitiveComponent* OverlappedCompon
 				if (ActorInFocusInteractable->Interactable)
 				{
 					HintInteractionWidget->SetVisibility(ESlateVisibility::Visible);
+					//set text of the widget to the name of the interactable
+
+					HintInteractionWidget->SetTextOfInteractionHint(FText::FromString(ActorInFocusInteractable->InteractionHintText));
+
 				}
 			}
 		}

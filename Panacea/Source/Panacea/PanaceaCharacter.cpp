@@ -74,7 +74,7 @@ void APanaceaCharacter::BeginPlay()
 
 	if (HintInteractionWidgetClass)
 	{
-		HintInteractionWidget = CreateWidget<UUserWidget>(GetWorld(), HintInteractionWidgetClass);
+		HintInteractionWidget = CreateWidget<UInteractionHintWidget>(GetWorld(), HintInteractionWidgetClass);
 
 		if (HintInteractionWidget)
 		{
@@ -163,7 +163,7 @@ UUserWidget* APanaceaCharacter::GetCrosshairWidget() const
 	return CrosshairWidget;
 }
 
-UUserWidget* APanaceaCharacter::GetHintInteractionWidget() const
+UInteractionHintWidget* APanaceaCharacter::GetHintInteractionWidget() const
 {
 	return HintInteractionWidget;
 }

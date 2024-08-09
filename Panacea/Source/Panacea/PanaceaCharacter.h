@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
+#include "InteractionHintWidget.h"
 #include "PanaceaCharacter.generated.h"
 
 
@@ -102,7 +103,8 @@ protected:
 	TSubclassOf<UUserWidget> HintInteractionWidgetClass;
 
 	UUserWidget* CrosshairWidget;
-	UUserWidget* HintInteractionWidget;
+	UPROPERTY()
+	UInteractionHintWidget* HintInteractionWidget;
 
 	// APawn interface
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
@@ -120,5 +122,5 @@ public:
 	UInputMappingContext* GetDefaultMappingContext() const { return DefaultMappingContext; }
 
 	UUserWidget* GetCrosshairWidget() const;
-	UUserWidget* GetHintInteractionWidget() const;
+	UInteractionHintWidget* GetHintInteractionWidget() const;
 };
