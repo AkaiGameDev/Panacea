@@ -197,7 +197,7 @@ void APanaceaCharacter::Look(const FInputActionValue& Value)
 
 void APanaceaCharacter::OnRestart()
 {
-	UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetName()), false);
+	UGameplayStatics::OpenLevel(this, MainMenuLevelFName, false);
 }
 
 void APanaceaCharacter::Pause()
