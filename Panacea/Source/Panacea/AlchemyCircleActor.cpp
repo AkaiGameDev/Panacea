@@ -58,7 +58,7 @@ void AAlchemyCircleActor::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AA
 
 	if (IngredientNameToPlace == Ingredient->GetActorNameOrLabel())
 	{
-		if (InteractiveComponent && (InteractiveComponent->bIsHolding))
+		if (!Ingredient->IsAttachedTo(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)))
 		{
 			Ingredient->SetNotInteractable();
 			InteractiveComponent->HideActor(Ingredient);
