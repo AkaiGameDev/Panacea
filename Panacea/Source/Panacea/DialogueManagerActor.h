@@ -37,4 +37,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data", meta = (AllowPrivateAccess = "true"))
 	UDataTable* MyDataTable;
+
+private:
+	FTimerHandle DialogueVisibilityTimerHandle;
 };
