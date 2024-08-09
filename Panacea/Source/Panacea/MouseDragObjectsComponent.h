@@ -39,6 +39,7 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Mouse Drag")
 	FOnComponentMouseRelease OnComponentMouseRelease;
 
+	bool GetIsGrabMode() const { return bIsGrabMode; }
 protected:
 	virtual void BeginPlay() override;
 

@@ -28,32 +28,20 @@ void AChairActor::BeginPlay()
 {
 	Super::BeginPlay();
 
+	StaticMeshComponent->SetRelativeLocation(StaticMeshComponent->GetRelativeLocation() + FVector(0.0f, -MinimumDistance, 0.0f));
+
 	OriginalLocation = StaticMeshComponent->GetComponentLocation();
+
+	ACharacter* Character = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+	InteractiveComponent = Character->GetComponentByClass<UInteractiveComponent>();
 }
 
-void AChairActor::Interact()
+void AChairActor::Tick(float DeltaTime)
 {
-	if (!Interactable)
+	if (!InteractiveComponent ||
+		InteractiveComponent->GetActorInFocus() != this ||
+		!InteractiveComponent->bIsHolding)
 		return;
-
-	if (StaticMeshComponent)
-	{
-		StaticMeshComponent->SetSimulatePhysics(!StaticMeshComponent->IsSimulatingPhysics());
-	}
-
-	if (SwitchComponent)
-	{
-		SwitchComponent->SwitchCamera();
-	}
-
-	
-	ACharacter* Character = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
-	UInteractiveComponent* InteractiveComponent = Character->GetComponentByClass<UInteractiveComponent>();
-
-	if (InteractiveComponent)
-	{
-		InteractiveComponent->bIsHolding = !InteractiveComponent->bIsHolding;
-	}
 
 	FVector FinalLocation = StaticMeshComponent->GetComponentLocation();
 
@@ -62,9 +50,9 @@ void AChairActor::Interact()
 	UE_LOG(LogTemp, Warning, TEXT("Distance Difference : %f"), Distance);
 
 
-	// Check if the angle difference is within the desired threshold (e.g., 23 degrees)
 	if (Distance > MinimumDistance)
 	{
+		Interact();
 		Broadcast();
 		SetNotInteractable();
 
@@ -72,5 +60,38 @@ void AChairActor::Interact()
 		{
 			InteractiveComponent->ResetActorInFocus(this);
 		}
+	}
+
+}
+
+
+void AChairActor::Interact()
+{
+	if (!Interactable)
+		return;
+
+	if (StaticMeshComponent)
+	{
+		if (!StaticMeshComponent->IsSimulatingPhysics())
+		{
+			StaticMeshComponent->SetSimulatePhysics(true);
+			StaticMeshComponent->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Ignore);
+
+		}
+		else
+		{
+			StaticMeshComponent->SetSimulatePhysics(false);
+			StaticMeshComponent->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Block);
+		}
+	}
+
+	if (SwitchComponent)
+	{
+		SwitchComponent->SwitchCamera();
+	}
+
+	if (InteractiveComponent)
+	{
+		InteractiveComponent->bIsHolding = !InteractiveComponent->bIsHolding;
 	}
 }

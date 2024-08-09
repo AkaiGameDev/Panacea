@@ -7,6 +7,7 @@
 #include "ChestActor.generated.h"
 
 class USwitchComponent;
+class UInteractiveComponent;
 
 /**
  * 
@@ -28,7 +29,6 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Mesh")
 	UStaticMeshComponent* TopStaticMeshComponent;
 
-
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	USwitchComponent* SwitchComponent;
 
@@ -42,6 +42,9 @@ public:
 
 	virtual void Interact() override;
 
+	virtual void Tick(float DeltaTime) override;
 private:
 	FVector OriginalAngleVector;
+
+	UInteractiveComponent* InteractiveComponent;
 };

@@ -140,21 +140,21 @@ void APanaceaCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 		//Reset Sequence
 		EnhancedInputComponent->BindAction(RestartAction, ETriggerEvent::Triggered, this,
-		                                   &APanaceaCharacter::OnRestart);
+			&APanaceaCharacter::OnRestart);
 
 		//Pause action
 		EnhancedInputComponent->BindAction(PauseAction, ETriggerEvent::Triggered, this, &APanaceaCharacter::Pause);
 
 		//Interact action
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this,
-		                                   &APanaceaCharacter::Interact);
+			&APanaceaCharacter::Interact);
 	}
 	else
 	{
 		UE_LOG(LogTemplateCharacter, Error,
-		       TEXT(
-			       "'%s' Failed to find an Enhanced Input Component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."
-		       ), *GetNameSafe(this));
+			TEXT(
+				"'%s' Failed to find an Enhanced Input Component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."
+			), *GetNameSafe(this));
 	}
 }
 
@@ -197,6 +197,9 @@ void APanaceaCharacter::Look(const FInputActionValue& Value)
 
 void APanaceaCharacter::OnRestart()
 {
+	if (MouseDragObjectsComponent->GetIsGrabMode())
+		MouseDragObjectsComponent->SwitchGrabMode();
+	
 	UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetName()), false);
 }
 

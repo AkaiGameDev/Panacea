@@ -76,10 +76,12 @@ void ADialogueManagerActor::ShowDialogue(const FString& ItemName)
 		if (DialogueWidget)
 			DialogueWidget->SetVisibility(ESlateVisibility::Visible);
 
-
-		FTimerHandle TimerHandle;
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]() {
-			DialogueWidget->SetVisibility(ESlateVisibility::Hidden);
+		GetWorld()->GetTimerManager().SetTimer(DialogueVisibilityTimerHandle, [this]()
+			{
+				if (DialogueWidget)
+				{
+					DialogueWidget->SetVisibility(ESlateVisibility::Hidden);
+				}
 			}, 5.0f, false);
 	}
 	else

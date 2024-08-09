@@ -48,6 +48,8 @@ public:
 
     UPROPERTY(EditAnywhere)
     bool bIsHolding;
+
+    AActor* GetActorInFocus() const { return ActorInFocus; }
 protected:
     // Called when the game starts
     virtual void BeginPlay() override;

@@ -34,22 +34,18 @@ void AChestActor::BeginPlay()
 	Super::BeginPlay();
 
 	OriginalAngleVector = TopStaticMeshComponent->GetComponentRotation().Vector();
+
+	ACharacter* Character = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+	InteractiveComponent = Character->GetComponentByClass<UInteractiveComponent>();
 }
 
-void AChestActor::Interact()
+
+void AChestActor::Tick(float DeltaTime)
 {
-	if (!Interactable)
+	if (!InteractiveComponent ||
+		InteractiveComponent->GetActorInFocus() != this ||
+		!InteractiveComponent->bIsHolding)
 		return;
-
-	if (TopStaticMeshComponent)
-	{
-		TopStaticMeshComponent->SetSimulatePhysics(!TopStaticMeshComponent->IsSimulatingPhysics());
-	}
-
-	if (SwitchComponent)
-	{
-		SwitchComponent->SwitchCamera();
-	}
 
 	FVector FinalAngleVector = TopStaticMeshComponent->GetComponentRotation().Vector();
 
@@ -71,16 +67,37 @@ void AChestActor::Interact()
 	// Check if the angle difference is within the desired threshold (e.g., 23 degrees)
 	if (AngleDifferenceDegrees > MinimumDegrees)
 	{
+		Interact();
 		Broadcast();
 		SetNotInteractable();
 
-		ACharacter* Character = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
-		UInteractiveComponent* InteractiveComponent = Character->GetComponentByClass<UInteractiveComponent>();
 
 		if (InteractiveComponent)
 		{
 			InteractiveComponent->ResetActorInFocus(this);
 		}
+	}
+}
+
+
+void AChestActor::Interact()
+{
+	if (!Interactable)
+		return;
+
+	if (TopStaticMeshComponent)
+	{
+		TopStaticMeshComponent->SetSimulatePhysics(!TopStaticMeshComponent->IsSimulatingPhysics());
+	}
+
+	if (SwitchComponent)
+	{
+		SwitchComponent->SwitchCamera();
+	}
+
+	if (InteractiveComponent)
+	{
+		InteractiveComponent->bIsHolding = !InteractiveComponent->bIsHolding;
 	}
 }
 
