@@ -23,7 +23,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USceneComponent* DefaultSceneRoot;
 
-	UPROPERTY(EditAnywhere, Category = "Mesh")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
 	UStaticMeshComponent* StaticMeshComponent;
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
@@ -40,6 +40,9 @@ public:
 	virtual void Interact() override;
 
 	virtual void Tick(float DeltaTime) override;
+
+	UFUNCTION(BlueprintCallable)
+	float GetMinimumDistance() const { return MinimumDistance; }
 
 private:
 	FVector OriginalLocation;

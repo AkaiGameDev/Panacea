@@ -28,6 +28,8 @@ void AChairActor::BeginPlay()
 {
 	Super::BeginPlay();
 
+	StaticMeshComponent->SetRelativeLocation(StaticMeshComponent->GetRelativeLocation() + FVector(0.0f, -MinimumDistance, 0.0f));
+
 	OriginalLocation = StaticMeshComponent->GetComponentLocation();
 
 	ACharacter* Character = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
@@ -40,7 +42,7 @@ void AChairActor::Tick(float DeltaTime)
 		InteractiveComponent->GetActorInFocus() != this ||
 		!InteractiveComponent->bIsHolding)
 		return;
-	
+
 	FVector FinalLocation = StaticMeshComponent->GetComponentLocation();
 
 	float Distance = FVector::Distance(OriginalLocation, FinalLocation);
@@ -48,7 +50,6 @@ void AChairActor::Tick(float DeltaTime)
 	UE_LOG(LogTemp, Warning, TEXT("Distance Difference : %f"), Distance);
 
 
-	// Check if the angle difference is within the desired threshold (e.g., 23 degrees)
 	if (Distance > MinimumDistance)
 	{
 		Interact();
@@ -71,7 +72,17 @@ void AChairActor::Interact()
 
 	if (StaticMeshComponent)
 	{
-		StaticMeshComponent->SetSimulatePhysics(!StaticMeshComponent->IsSimulatingPhysics());
+		if (!StaticMeshComponent->IsSimulatingPhysics())
+		{
+			StaticMeshComponent->SetSimulatePhysics(true);
+			StaticMeshComponent->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Ignore);
+
+		}
+		else
+		{
+			StaticMeshComponent->SetSimulatePhysics(false);
+			StaticMeshComponent->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Block);
+		}
 	}
 
 	if (SwitchComponent)
