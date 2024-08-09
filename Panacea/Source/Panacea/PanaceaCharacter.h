@@ -124,6 +124,11 @@ public:
 	UUserWidget* GetCrosshairWidget() const;
 	UInteractionHintWidget* GetHintInteractionWidget() const;
 
-	UPROPERTY(EditAnywhere,Category="Menus")
-	FName MainMenuLevelFName;
+	//UPROPERTY(EditAnywhere,Category="Menus")
+	//FName MainMenuLevelFName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MenuLevel")
+	TSoftObjectPtr<UWorld> MenuLevel;
+
+
 };

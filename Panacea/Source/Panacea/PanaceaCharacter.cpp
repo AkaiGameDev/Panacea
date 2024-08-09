@@ -197,7 +197,9 @@ void APanaceaCharacter::Look(const FInputActionValue& Value)
 
 void APanaceaCharacter::OnRestart()
 {
-	UGameplayStatics::OpenLevel(this, MainMenuLevelFName, false);
+
+	UGameplayStatics::OpenLevelBySoftObjectPtr(this, MenuLevel, true);
+	UE_LOG(LogTemp,Warning,TEXT("Restarted the level"));
 }
 
 void APanaceaCharacter::Pause()
