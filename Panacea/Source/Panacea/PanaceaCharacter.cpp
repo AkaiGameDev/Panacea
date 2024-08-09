@@ -15,6 +15,10 @@
 #include "GrabbingSystemComponent.h"
 #include "MouseDragObjectsComponent.h"
 #include "InteractiveComponent.h"
+#include "MetasoundSource.h"
+#include "Components/AudioComponent.h"
+#include "Sound/SoundBase.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -46,11 +50,14 @@ APanaceaCharacter::APanaceaCharacter()
 	// Create an InteractiveComponent
 	InteractiveComponent = CreateDefaultSubobject<UInteractiveComponent>(TEXT("InteractiveComponent"));
 
+	MetaSoundAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("MetaSoundAudioComponent"));
+	MetaSoundAudioComponent->SetupAttachment(RootComponent);
+
 }
 
 void APanaceaCharacter::BeginPlay()
 {
-	UE_LOG(LogTemp, Warning, TEXT("APanaceaCharacter::BeginPlay - Start"));
+	//UE_LOG(LogTemp, Warning, TEXT("APanaceaCharacter::BeginPlay - Start"));
 	if (CrosshairWidgetClass) // Ensure the widget class is set
 	{
 		if (CrosshairWidgetClass)
@@ -59,7 +66,7 @@ void APanaceaCharacter::BeginPlay()
 			if (CrosshairWidget)
 			{
 				CrosshairWidget->AddToViewport();
-				UE_LOG(LogTemp, Warning, TEXT("Crosshair widget created"));
+				//UE_LOG(LogTemp, Warning, TEXT("Crosshair widget created"));
 			}
 			else
 			{
@@ -79,7 +86,7 @@ void APanaceaCharacter::BeginPlay()
 		if (HintInteractionWidget)
 		{
 			HintInteractionWidget->AddToViewport();
-			UE_LOG(LogTemp, Warning, TEXT("Hint Interaction widget created"));
+			//UE_LOG(LogTemp, Warning, TEXT("Hint Interaction widget created"));
 		}
 		else
 		{
@@ -113,6 +120,12 @@ void APanaceaCharacter::BeginPlay()
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("APanaceaCharacter::BeginPlay - End"));
+
+	if (MetaSoundSource)
+	{
+		MetaSoundAudioComponent->SetSound(MetaSoundSource);
+
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////// Input
@@ -132,7 +145,7 @@ void APanaceaCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		// Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APanaceaCharacter::Move);
 
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &APanaceaCharacter::JumpFunction);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
 		// Looking
@@ -199,7 +212,7 @@ void APanaceaCharacter::OnRestart()
 {
 	if (MouseDragObjectsComponent->GetIsGrabMode())
 		MouseDragObjectsComponent->SwitchGrabMode();
-	
+
 	UGameplayStatics::OpenLevel(this, FName(*GetWorld()->GetName()), false);
 }
 
@@ -212,4 +225,25 @@ void APanaceaCharacter::Interact(const FInputActionValue& Value)
 {
 	if (InteractiveComponent)
 		InteractiveComponent->Interact(Value);
+}
+
+void APanaceaCharacter::JumpFunction()
+{
+
+	if (!GetCharacterMovement()->IsFalling())
+	{
+		TriggerSoundPlay(FName("PlayJumpSound"));
+	}
+
+	Jump();
+}
+
+void APanaceaCharacter::TriggerSoundPlay(const FName& TriggerParameterName)
+{
+	if (MetaSoundAudioComponent)
+	{
+		MetaSoundAudioComponent->Play();
+
+		MetaSoundAudioComponent->SetTriggerParameter(TriggerParameterName);
+	}
 }

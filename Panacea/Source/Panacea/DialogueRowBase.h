@@ -23,6 +23,6 @@ public:
     FString source;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    FString Description;
+    FString SoundToPlay;
 
 };

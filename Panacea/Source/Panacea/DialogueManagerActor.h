@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "PanaceaCharacter.h"
+
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "DialogueManagerActor.generated.h"
@@ -40,4 +42,6 @@ public:
 
 private:
 	FTimerHandle DialogueVisibilityTimerHandle;
+
+	APanaceaCharacter* Character;
 };

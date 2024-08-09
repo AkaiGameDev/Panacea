@@ -18,6 +18,8 @@ class UMouseDragObjectsComponent;
 class UGrabbingSystemComponent;
 class UPhysicsHandleComponent;
 class UInteractiveComponent;
+class UAudioComponent;
+class UMetaSoundSource;
 struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
@@ -47,6 +49,12 @@ class APanaceaCharacter : public ACharacter
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly,meta = (AllowPrivateAccess = "true"))
 	UInteractiveComponent* InteractiveComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "Audio")
+	UAudioComponent* MetaSoundAudioComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Audio")
+	UMetaSoundSource* MetaSoundSource;
+
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	UInputMappingContext* DefaultMappingContext;
@@ -75,6 +83,8 @@ class APanaceaCharacter : public ACharacter
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	UInputAction* InteractAction;
 	
+
+
 public:
 	APanaceaCharacter();
 
@@ -95,6 +105,7 @@ protected:
 	void Pause();
 
 	void Interact(const FInputActionValue& Value);
+	void JumpFunction();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 	TSubclassOf<UUserWidget> CrosshairWidgetClass;
@@ -112,7 +123,9 @@ protected:
 
 public:
 	/** Returns Mesh1P subobject **/
-	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
+	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P;}
+
+	void TriggerSoundPlay(const FName& TriggerParameterName);
 
 	/** Returns FirstPersonCameraComponent subobject **/
 	UFUNCTION(BlueprintCallable)

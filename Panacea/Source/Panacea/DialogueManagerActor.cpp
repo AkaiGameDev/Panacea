@@ -57,6 +57,7 @@ void ADialogueManagerActor::BeginPlay()
 		UE_LOG(LogTemp, Error, TEXT("DialogueWidgetClass is null"));
 	}
 
+	Character = Cast<APanaceaCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
 }
 
 
@@ -64,28 +65,34 @@ void ADialogueManagerActor::ShowDialogue(const FString& ItemName)
 {
 	static const FString ContextString(TEXT("GENERAL"));
 
-	if (MyDataTable)
-	{
-		FDialogueRowBase* row = MyDataTable->FindRow<FDialogueRowBase>(FName(ItemName), ContextString);
-
-		if (!row)
-			return;
-
-		DialogueTextBlock->SetText(FText::FromString(row->source));
-
-		if (DialogueWidget)
-			DialogueWidget->SetVisibility(ESlateVisibility::Visible);
-
-		GetWorld()->GetTimerManager().SetTimer(DialogueVisibilityTimerHandle, [this]()
-			{
-				if (DialogueWidget)
-				{
-					DialogueWidget->SetVisibility(ESlateVisibility::Hidden);
-				}
-			}, 5.0f, false);
-	}
-	else
+	if (!MyDataTable)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("DataTable is null"));
 	}
+
+	FDialogueRowBase* row = MyDataTable->FindRow<FDialogueRowBase>(FName(ItemName), ContextString);
+
+	if (!row)
+		return;
+
+	DialogueTextBlock->SetText(FText::FromString(row->source));
+
+	if (DialogueWidget)
+		DialogueWidget->SetVisibility(ESlateVisibility::Visible);
+
+	if (!Character)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Owner is not of class APanaceaCharacter"));
+		return;
+	}
+
+	Character->TriggerSoundPlay(FName(row->SoundToPlay));
+
+	GetWorld()->GetTimerManager().SetTimer(DialogueVisibilityTimerHandle, [this]()
+		{
+			if (DialogueWidget)
+			{
+				DialogueWidget->SetVisibility(ESlateVisibility::Hidden);
+			}
+		}, 5.0f, false);
 }
