@@ -29,6 +29,9 @@ public:
 	FString InteractionHintText;
 
 	UPROPERTY(EditAnywhere)
+	FString WhileInteractingHintText;
+
+	UPROPERTY(EditAnywhere)
 	FString InteractableTrigger;
 
 	//Flag that controls whether the player can pick up the item
