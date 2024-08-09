@@ -47,7 +47,6 @@ public:
 		// Set this actor to call Tick() every frame. You can turn this off to improve performance if you don't need it.
 		PrimaryActorTick.bCanEverTick = true;
 		GameMode->OnItemInteractedDelegate.AddDynamic(this, &AItem::CheckInteractable);
-		//GameMode->OnItemFirstInteractedDelegate.AddDynamic(this, &AItem::FirstInteraction);
 	}
 
 	virtual void Broadcast() override {
@@ -59,8 +58,11 @@ public:
 			return;
 		}
 
-		UE_LOG(LogTemp, Warning, TEXT("%s broadcasted"), *GetActorNameOrLabel());
-		GameMode->OnItemInteractedDelegate.Broadcast(GetActorNameOrLabel());
+		FString ItemID = GetActorNameOrLabel();
+		UE_LOG(LogTemp, Warning, TEXT("%s"), *ItemID);
+		bool bIsFirst = !GameMode->GetItemNames().Contains(ItemID);
+		if (bIsFirst)
+			GameMode->OnItemInteractedDelegate.Broadcast(ItemID);
 	}
 
 	virtual void OnInteractableInRange() override {
@@ -78,6 +80,7 @@ public:
 				MeshComponent->SetRenderCustomDepth(true);
 		}
 	}
+
 	virtual void OnInteractableOutOfRange() override {
 
 		TArray<UStaticMeshComponent*> MeshComponents;

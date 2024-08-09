@@ -6,6 +6,7 @@
 
 #include "Blueprint/UserWidget.h"
 #include "Components/TextBlock.h"
+#include "DialogueRowBase.h"
 
 // Sets default values
 ADialogueManagerActor::ADialogueManagerActor()
@@ -61,20 +62,28 @@ void ADialogueManagerActor::BeginPlay()
 
 void ADialogueManagerActor::ShowDialogue(const FString& ItemName)
 {
-	//format message
-	const FText Message = FText::Format(FText::FromString("I am a kid and i just interacted with {0}"), FText::FromString(ItemName));
+	static const FString ContextString(TEXT("GENERAL"));
 
-	UE_LOG(LogTemp, Warning, TEXT("Should display dialogue: %s"), *Message.ToString());
+	if (MyDataTable)
+	{
+		FDialogueRowBase* row = MyDataTable->FindRow<FDialogueRowBase>(FName(ItemName), ContextString);
 
-	DialogueTextBlock->SetText(Message);
+		if (!row)
+			return;
 
-	if (DialogueWidget)
-		DialogueWidget->SetVisibility(ESlateVisibility::Visible);
+		DialogueTextBlock->SetText(FText::FromString(row->source));
+
+		if (DialogueWidget)
+			DialogueWidget->SetVisibility(ESlateVisibility::Visible);
 
 
-	FTimerHandle TimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]() {
-		DialogueWidget->SetVisibility(ESlateVisibility::Hidden);
-		}, 5.0f, false);
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]() {
+			DialogueWidget->SetVisibility(ESlateVisibility::Hidden);
+			}, 5.0f, false);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("DataTable is null"));
+	}
 }
-

@@ -7,7 +7,6 @@
 #include "DialogueManagerActor.generated.h"
 
 
-
 UCLASS()
 class PANACEA_API ADialogueManagerActor : public AActor
 {
@@ -36,4 +35,6 @@ public:
 	UFUNCTION()
 	void ShowDialogue(const FString& ItemName);
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data", meta = (AllowPrivateAccess = "true"))
+	UDataTable* MyDataTable;
 };
