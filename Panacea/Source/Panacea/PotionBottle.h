@@ -37,6 +37,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	float BreakableDistance;
 
+	UPROPERTY(EditAnywhere)
+	bool bHasAmber;
+
 protected:
 	virtual void BeginPlay() override;
 

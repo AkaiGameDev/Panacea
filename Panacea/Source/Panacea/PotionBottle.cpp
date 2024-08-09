@@ -7,6 +7,7 @@ APotionBottle::APotionBottle()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	bIsBreaked = false;
+	bHasAmber = false;
 	BreakableDistance = 20.0f;
 
 	DefaultSceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("DefaultSceneRoot"));
@@ -54,8 +55,6 @@ void APotionBottle::OnComponentFracture(const FChaosBreakEvent& BreakEvent)
 		
 
 		Interact();
-
-		Broadcast();
 		SetNotInteractable();
 
 		ACharacter* Character = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
@@ -65,9 +64,9 @@ void APotionBottle::OnComponentFracture(const FChaosBreakEvent& BreakEvent)
 		{
 			InteractiveComponent->ResetActorInFocus(this);
 
-			if (ActorToSpawn)
+			if (bHasAmber && ActorToSpawn)
 			{
-
+				Broadcast();
 				// Get the location and rotation of the current actor
 				FVector SpawnLocation = BreakEvent.Location;
 				FRotator SpawnRotation = GetActorRotation();
@@ -119,7 +118,6 @@ void APotionBottle::OnComponentReleased(UPrimitiveComponent* ReleasedComponent)
 	BoxExtent.Z /= 2.0f;
 	FCollisionShape Box = FCollisionShape::MakeBox(BoxExtent);
 	FHitResult HitResult;
-
 
 	ACharacter* Character = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 	FCollisionQueryParams QueryParams;
