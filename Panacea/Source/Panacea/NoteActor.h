@@ -53,5 +53,6 @@ public:
 	UFUNCTION()
 	FString ReplaceLineBreakPlaceholder(const FString& OriginalText);
 
-	void OpenNote();
+	UFUNCTION()
+	virtual void OpenNote();
 };
