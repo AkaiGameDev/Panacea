@@ -28,7 +28,7 @@ void AChairActor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	StaticMeshComponent->SetRelativeLocation(StaticMeshComponent->GetRelativeLocation() + FVector(0.0f, -MinimumDistance, 0.0f));
+	StaticMeshComponent->SetWorldLocation(StaticMeshComponent->GetComponentLocation() - StaticMeshComponent->GetForwardVector() * MinimumDistance);
 
 	OriginalLocation = StaticMeshComponent->GetComponentLocation();
 
