@@ -64,6 +64,9 @@ public:
 
 	TArray<FString> GetItemNames() const { return ItemNames; }
 
+protected:
+	virtual void BeginPlay() override;
+
 private:
 
 	void CheckGoodEnding();
