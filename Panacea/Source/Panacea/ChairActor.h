@@ -7,6 +7,7 @@
 #include "ChairActor.generated.h"
 
 class USwitchComponent;
+class UInteractiveComponent;
 
 /**
  * 
@@ -38,6 +39,10 @@ public:
 
 	virtual void Interact() override;
 
+	virtual void Tick(float DeltaTime) override;
+
 private:
 	FVector OriginalLocation;
+
+	UInteractiveComponent* InteractiveComponent;
 };

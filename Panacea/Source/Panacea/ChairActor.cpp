@@ -29,7 +29,40 @@ void AChairActor::BeginPlay()
 	Super::BeginPlay();
 
 	OriginalLocation = StaticMeshComponent->GetComponentLocation();
+
+	ACharacter* Character = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+	InteractiveComponent = Character->GetComponentByClass<UInteractiveComponent>();
 }
+
+void AChairActor::Tick(float DeltaTime)
+{
+	if (!InteractiveComponent ||
+		InteractiveComponent->GetActorInFocus() != this ||
+		!InteractiveComponent->bIsHolding)
+		return;
+	
+	FVector FinalLocation = StaticMeshComponent->GetComponentLocation();
+
+	float Distance = FVector::Distance(OriginalLocation, FinalLocation);
+
+	UE_LOG(LogTemp, Warning, TEXT("Distance Difference : %f"), Distance);
+
+
+	// Check if the angle difference is within the desired threshold (e.g., 23 degrees)
+	if (Distance > MinimumDistance)
+	{
+		Interact();
+		Broadcast();
+		SetNotInteractable();
+
+		if (InteractiveComponent)
+		{
+			InteractiveComponent->ResetActorInFocus(this);
+		}
+	}
+
+}
+
 
 void AChairActor::Interact()
 {
@@ -46,31 +79,8 @@ void AChairActor::Interact()
 		SwitchComponent->SwitchCamera();
 	}
 
-	
-	ACharacter* Character = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
-	UInteractiveComponent* InteractiveComponent = Character->GetComponentByClass<UInteractiveComponent>();
-
 	if (InteractiveComponent)
 	{
 		InteractiveComponent->bIsHolding = !InteractiveComponent->bIsHolding;
-	}
-
-	FVector FinalLocation = StaticMeshComponent->GetComponentLocation();
-
-	float Distance = FVector::Distance(OriginalLocation, FinalLocation);
-
-	UE_LOG(LogTemp, Warning, TEXT("Distance Difference : %f"), Distance);
-
-
-	// Check if the angle difference is within the desired threshold (e.g., 23 degrees)
-	if (Distance > MinimumDistance)
-	{
-		Broadcast();
-		SetNotInteractable();
-
-		if (InteractiveComponent)
-		{
-			InteractiveComponent->ResetActorInFocus(this);
-		}
 	}
 }

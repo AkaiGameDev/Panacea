@@ -29,23 +29,17 @@ void ACrossActor::BeginPlay()
 	Super::BeginPlay();
 
 	OriginalAngleVector = StaticMeshComponent->GetComponentRotation().Vector();
+
+	ACharacter* Character = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+	InteractiveComponent = Character->GetComponentByClass<UInteractiveComponent>();
 }
 
-void ACrossActor::Interact()
+void ACrossActor::Tick(float DeltaTime)
 {
-
-	if (!Interactable)
+	if (!InteractiveComponent ||
+		InteractiveComponent->GetActorInFocus() != this ||
+		!InteractiveComponent->bIsHolding)
 		return;
-	
-	if (StaticMeshComponent)
-	{
-		StaticMeshComponent->SetSimulatePhysics(!StaticMeshComponent->IsSimulatingPhysics());
-	}
-
-	if (SwitchComponent)
-	{
-		SwitchComponent->SwitchCamera();
-	}
 
 	FVector FinalAngleVector = StaticMeshComponent->GetComponentRotation().Vector();
 
@@ -67,11 +61,9 @@ void ACrossActor::Interact()
 	// Check if the angle difference is within the desired threshold (e.g., 23 degrees)
 	if (AngleDifferenceDegrees > MinimumDegrees)
 	{
+		Interact();
 		Broadcast();
 		SetNotInteractable();
-
-		ACharacter* Character = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
-		UInteractiveComponent* InteractiveComponent = Character->GetComponentByClass<UInteractiveComponent>();
 
 		if (InteractiveComponent)
 		{
@@ -81,23 +73,24 @@ void ACrossActor::Interact()
 }
 
 
-//void ACrossActor::Tick(float DeltaTime)
-//{
-//	FVector FinalAngleVector = StaticMeshComponent->GetComponentRotation().Vector();
-//
-//	// Normalize the vectors
-//	OriginalAngleVector.Normalize();
-//	FinalAngleVector.Normalize();
-//
-//	// Calculate the dot product of the normalized vectors
-//	float DotProduct = FVector::DotProduct(OriginalAngleVector, FinalAngleVector);
-//
-//	// Compute the angle difference in radians
-//	float AngleDifferenceRadians = FMath::Acos(DotProduct);
-//
-//	// Convert radians to degrees if needed
-//	float AngleDifferenceDegrees = FMath::RadiansToDegrees(AngleDifferenceRadians);
-//
-//	UE_LOG(LogTemp, Warning, TEXT("Angle Difference (Degrees): %f"), AngleDifferenceDegrees);
-//
-//}
+void ACrossActor::Interact()
+{
+
+	if (!Interactable)
+		return;
+	
+	if (StaticMeshComponent)
+	{
+		StaticMeshComponent->SetSimulatePhysics(!StaticMeshComponent->IsSimulatingPhysics());
+	}
+
+	if (SwitchComponent)
+	{
+		SwitchComponent->SwitchCamera();
+	}
+
+	if (InteractiveComponent)
+	{
+		InteractiveComponent->bIsHolding = !InteractiveComponent->bIsHolding;
+	}
+}
