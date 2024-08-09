@@ -81,6 +81,18 @@ void ANoteActor::CloseNote()
 	bOpened = false;
 }
 
+FString ANoteActor::ReplaceLineBreakPlaceholder(const FString& OriginalText)
+{
+	// Define the placeholder and the actual line break character
+	const FString Placeholder = TEXT("<<br>>");
+	const FString LineBreak = TEXT("\n");
+
+	// Replace all occurrences of the placeholder with the line break
+	FString ProcessedText = OriginalText.Replace(*Placeholder, *LineBreak);
+
+	return ProcessedText;
+}
+
 void ANoteActor::OpenNote()
 {
 	if (!PauseMenuWidgetClass)
@@ -113,7 +125,8 @@ void ANoteActor::OpenNote()
 	UTextBlock* TextBlock = Cast<UTextBlock>(NoteWidget->GetWidgetFromName(TEXT("Content")));
 	if (TextBlock)
 	{
-		TextBlock->SetText(FText::FromString(NoteText));
+		FString TextWithLineBreaks = ReplaceLineBreakPlaceholder(NoteText);
+		TextBlock->SetText(FText::FromString(TextWithLineBreaks));
 	}
 
 

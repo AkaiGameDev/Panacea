@@ -43,11 +43,15 @@ protected:
 	UInputMappingContext* CharacterDefaultMappingContext;
 
 public:
+
 	UFUNCTION(BlueprintCallable)
 	virtual void Interact() override;
 
 	UFUNCTION(BlueprintCallable)
 	void CloseNote();
+
+	UFUNCTION()
+	FString ReplaceLineBreakPlaceholder(const FString& OriginalText);
 
 	void OpenNote();
 };
