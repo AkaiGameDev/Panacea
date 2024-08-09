@@ -11,7 +11,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Camera/CameraComponent.h"  // Ensure this is included
 #include "Item.h"
-#include "GeometryCollection/GeometryCollectionComponent.h" 
+#include "GeometryCollection/GeometryCollectionComponent.h"
 
 UInteractiveComponent::UInteractiveComponent()
 {
@@ -74,6 +74,7 @@ void UInteractiveComponent::BeginPlay()
 	if (HintInteractionWidget)
 	{
 		HintInteractionWidget->SetVisibility(ESlateVisibility::Hidden);
+		//get text component
 	}
 	else
 	{
@@ -81,7 +82,8 @@ void UInteractiveComponent::BeginPlay()
 	}
 }
 
-void UInteractiveComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UInteractiveComponent::TickComponent(float DeltaTime, ELevelTick TickType,
+                                          FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
@@ -94,8 +96,8 @@ void UInteractiveComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 }
 
 void UInteractiveComponent::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
-	const FHitResult& SweepResult)
+                                           UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+                                           const FHitResult& SweepResult)
 {
 	if (Cast<IInteractable>(OtherActor) != nullptr)
 	{
@@ -112,13 +114,11 @@ void UInteractiveComponent::OnOverlapBegin(UPrimitiveComponent* OverlappedCompon
 
 		if (ActorInFocus != NewActorInFocus)
 		{
-
 			// Notify the old actor that it is out of range
 			if (ActorInFocusInteractable)
 			{
 				ActorInFocusInteractable->OnInteractableOutOfRange();
 				HintInteractionWidget->SetVisibility(ESlateVisibility::Hidden);
-
 			}
 
 			SetActorInFocus(NewActorInFocus);
@@ -131,6 +131,8 @@ void UInteractiveComponent::OnOverlapBegin(UPrimitiveComponent* OverlappedCompon
 				if (ActorInFocusInteractable->Interactable)
 				{
 					HintInteractionWidget->SetVisibility(ESlateVisibility::Visible);
+					HintInteractionWidget->SetTextOfInteractionHint(
+						FText::FromString(ActorInFocusInteractable->InteractionHintText));
 				}
 			}
 		}
@@ -138,11 +140,10 @@ void UInteractiveComponent::OnOverlapBegin(UPrimitiveComponent* OverlappedCompon
 }
 
 void UInteractiveComponent::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+                                         UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	if (IInteractable* Interactable = Cast<IInteractable>(OtherActor))
 	{
-
 		if (bIsMovingToTarget)
 			return;
 
@@ -193,15 +194,23 @@ void UInteractiveComponent::Interact(const FInputActionValue& Value)
 		return;
 
 	if (Item->Interactable)
+	{
 		Item->Interact();
+
+	}
 	else
+	{
 		return;
+	}
+
 
 	//Check have item changed after Interact function
 	AItem* ItemCheck = Cast<AItem>(ActorInFocus);
 
 	if (Item != ItemCheck)
 		return;
+
+	HintInteractionWidget->SetTextOfInteractionHint(FText::FromString(Item->WhileInteractingHintText));
 
 	if (Item->Grabbable)
 	{
@@ -244,17 +253,16 @@ void UInteractiveComponent::Release()
 			FRotator CurrentRotation = ActorInFocusRootComponent->GetComponentRotation();
 
 			SetAndStartMovement(TargetLocationToRelease, FRotator(0.0f, CurrentRotation.Yaw, 0.0f), true);
-
 		}
 		else
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Path is not clear, cannot release actor."));
 		}
-
 	}
 }
 
-bool UInteractiveComponent::IsPathClear(const FVector& StartLocation, const FVector& EndLocation, const FVector& BoxExtent) const
+bool UInteractiveComponent::IsPathClear(const FVector& StartLocation, const FVector& EndLocation,
+                                        const FVector& BoxExtent) const
 {
 	FCollisionShape Box = FCollisionShape::MakeBox(BoxExtent);
 	FHitResult HitResult;
@@ -296,7 +304,8 @@ void UInteractiveComponent::OnMoveItemComplete()
 	{
 		if (CharacterCameraComponent && ActorInFocusRootComponent && ActorInFocusInteractable)
 		{
-			ActorInFocusRootComponent->AttachToComponent(CharacterCameraComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+			ActorInFocusRootComponent->AttachToComponent(CharacterCameraComponent,
+			                                             FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 
 			ActorInFocusInteractable->OnInteractableOutOfRange();
 		}
@@ -325,7 +334,6 @@ void UInteractiveComponent::OnMoveItemComplete()
 			ActorInFocusInteractable->OnInteractableInRange();
 		}
 	}
-
 }
 
 AActor* UInteractiveComponent::GetClosestToOwner(const TArray<AActor*>& ActorsToCheck)
@@ -354,14 +362,17 @@ AActor* UInteractiveComponent::GetClosestToOwner(const TArray<AActor*>& ActorsTo
 			UStaticMeshComponent* StaticMesh = InteractableActor->GetComponentByClass<UStaticMeshComponent>();
 
 			FVector Start = CharacterCameraComponent->GetComponentLocation();
-			FVector End = StaticMesh ? End = StaticMesh->GetComponentLocation() : End = InteractableActor->GetActorLocation();
+			FVector End = StaticMesh
+				              ? End = StaticMesh->GetComponentLocation()
+				              : End = InteractableActor->GetActorLocation();
 
 			FHitResult HitResult;
 
 			FCollisionQueryParams QueryParams;
 			QueryParams.AddIgnoredActor(Owner);
 
-			UGeometryCollectionComponent* GeometryCollection = InteractableActor->GetComponentByClass<UGeometryCollectionComponent>();
+			UGeometryCollectionComponent* GeometryCollection = InteractableActor->GetComponentByClass<
+				UGeometryCollectionComponent>();
 			if (GeometryCollection)
 				QueryParams.AddIgnoredComponent(GeometryCollection);
 
@@ -453,7 +464,8 @@ void UInteractiveComponent::HideActor(AActor* ActorToHide)
 	HintInteractionWidget->SetVisibility(ESlateVisibility::Hidden);
 }
 
-void UInteractiveComponent::SetAndStartMovement(const FVector& TargetVector, const FRotator& TargetRotator, bool bIsRelease)
+void UInteractiveComponent::SetAndStartMovement(const FVector& TargetVector, const FRotator& TargetRotator,
+                                                bool bIsRelease)
 {
 	if (ActorInFocusRootComponent)
 	{
@@ -471,7 +483,8 @@ void UInteractiveComponent::SetAndStartMovement(const FVector& TargetVector, con
 				return;
 			}
 
-			ActorInFocusRootComponent->AttachToComponent(CharacterCameraComponent, FAttachmentTransformRules::KeepWorldTransform);
+			ActorInFocusRootComponent->AttachToComponent(CharacterCameraComponent,
+			                                             FAttachmentTransformRules::KeepWorldTransform);
 		}
 
 		bIsMovingToTarget = true;
@@ -480,9 +493,12 @@ void UInteractiveComponent::SetAndStartMovement(const FVector& TargetVector, con
 
 void UInteractiveComponent::OnTickUpdateItemTransform(float DeltaTime)
 {
-
-	FVector CurrentLocation = bIsHolding ? ActorInFocusRootComponent->GetComponentLocation() : ActorInFocusRootComponent->GetRelativeLocation();
-	FRotator CurrentRotation = bIsHolding ? ActorInFocusRootComponent->GetComponentRotation() : ActorInFocusRootComponent->GetRelativeRotation();
+	FVector CurrentLocation = bIsHolding
+		                          ? ActorInFocusRootComponent->GetComponentLocation()
+		                          : ActorInFocusRootComponent->GetRelativeLocation();
+	FRotator CurrentRotation = bIsHolding
+		                           ? ActorInFocusRootComponent->GetComponentRotation()
+		                           : ActorInFocusRootComponent->GetRelativeRotation();
 
 	FVector DesiredLocation = bIsHolding ? TargetLocationToRelease : GrabbedActorLocationViewport;
 	FRotator DesiredRotation = bIsHolding ? TargetRotationToRelease : GrabbedActorRotationViewport;
@@ -502,7 +518,8 @@ void UInteractiveComponent::OnTickUpdateItemTransform(float DeltaTime)
 	}
 
 	bool bLocationReached = FVector::Dist(NewLocation, DesiredLocation) < 1.0f;
-	bool bRotationReached = FQuat::Slerp(CurrentRotation.Quaternion(), DesiredRotation.Quaternion(), DeltaTime * MovementSpeed).Equals(DesiredRotation.Quaternion(), 1.0f);
+	bool bRotationReached = FQuat::Slerp(CurrentRotation.Quaternion(), DesiredRotation.Quaternion(),
+	                                     DeltaTime * MovementSpeed).Equals(DesiredRotation.Quaternion(), 1.0f);
 
 	if (bLocationReached && bRotationReached)
 	{

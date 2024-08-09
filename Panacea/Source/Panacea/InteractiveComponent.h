@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Components/CapsuleComponent.h"
-
+#include "InteractionHintWidget.h"
 #include "InputActionValue.h"
 #include "InteractiveComponent.generated.h"
 
@@ -94,7 +94,8 @@ private:
 
     FRotator TargetRotationToRelease;
 
-    UUserWidget* HintInteractionWidget;
+    UPROPERTY()
+    UInteractionHintWidget* HintInteractionWidget;
 
     bool bIsMovingToTarget;
 
