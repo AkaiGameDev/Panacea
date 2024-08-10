@@ -9,6 +9,8 @@
 #include "PanaceaCharacter.h"
 #include "AlchemyCircleActor.generated.h"
 
+class UParticleSystemComponent;
+
 /**
  * 
  */
@@ -17,9 +19,6 @@ class PANACEA_API AAlchemyCircleActor : public AItem
 {
 	GENERATED_BODY()
 
-
-
-	
 public:
 	AAlchemyCircleActor();
 
@@ -29,10 +28,12 @@ public:
 	UPROPERTY(EditAnywhere,Category="Config")
 	FString IngredientNameToPlace;
 
+	// The particle system component
+	UPROPERTY(VisibleAnywhere, Category = "Effects")
+	UParticleSystemComponent* ParticleSystemComponent;
 
 	UFUNCTION()
 	virtual void BeginPlay() override;
-
 
 	// Called when the sphere overlaps with another actor
 	UFUNCTION()
