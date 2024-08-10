@@ -24,10 +24,16 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	virtual void Interact() override;
 
 	UFUNCTION()
 	void Enable();
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	TSubclassOf<UUserWidget> EndingCutSceneWidgetClass;
+
+	UPROPERTY()
+	UUserWidget* EndingCutSceneWidget;
 
 private:
 	UPROPERTY()

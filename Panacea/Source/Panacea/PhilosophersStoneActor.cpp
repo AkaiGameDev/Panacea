@@ -2,6 +2,7 @@
 
 
 #include "PhilosophersStoneActor.h"
+#include "Blueprint/UserWidget.h"
 
 // Sets default values
 APhilosophersStoneActor::APhilosophersStoneActor()
@@ -35,9 +36,24 @@ void APhilosophersStoneActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if(bEnabled)
+	if (bEnabled)
 	{
 		MoveStone(DeltaTime);
+	}
+}
+
+void APhilosophersStoneActor::Interact()
+{
+	if (!EndingCutSceneWidgetClass)
+	{
+		UE_LOG(LogTemp, Error, TEXT("EndingCutSceneWidgetClass is null"));
+		return;
+	}
+
+	EndingCutSceneWidget = CreateWidget<UUserWidget>(GetWorld(), EndingCutSceneWidgetClass);
+	if (EndingCutSceneWidget)
+	{
+		EndingCutSceneWidget->AddToViewport(0);
 	}
 }
 
@@ -45,7 +61,7 @@ void APhilosophersStoneActor::Enable()
 {
 	bEnabled = true;
 	StoneMeshComponent->SetVisibility(true);
-	Interactable = true;
+	SetInteractable();
 }
 
 void APhilosophersStoneActor::MoveStone(float DeltaTime)
