@@ -25,6 +25,9 @@ public:
 	UPROPERTY(EditAnywhere, Category= "UI")
 	FString NoteText;
 
+	UPROPERTY(EditAnywhere, Category = "UI")
+	UTexture2D* NoteImage;
+
 	UPROPERTY()
 	UNoteWidget* NoteWidget = nullptr;
 

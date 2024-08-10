@@ -22,6 +22,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Note")
 	ANoteActor* GetNoteActor() const;
 
+	
+	UPROPERTY(BlueprintReadOnly, Category = "UI")
+	UTexture2D* NoteImage;
+
 protected:
 	/** Note actor reference */
 	UPROPERTY(BlueprintReadOnly, Category = "Note")
