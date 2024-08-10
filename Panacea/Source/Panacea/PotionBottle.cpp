@@ -70,14 +70,13 @@ void APotionBottle::OnComponentFracture(const FChaosBreakEvent& BreakEvent)
 				// Get the location and rotation of the current actor
 				FVector SpawnLocation = BreakEvent.Location;
 				FRotator SpawnRotation = GetActorRotation();
-
+				FActorSpawnParameters SpawnParams;
+				SpawnParams.Name = FName(TEXT("Amber"));
 				// Spawn the new actor
-				AItem* SpawnedActor = GetWorld()->SpawnActor<AItem>(ActorToSpawn, SpawnLocation, SpawnRotation);
+				AItem* SpawnedActor = GetWorld()->SpawnActor<AItem>(ActorToSpawn, SpawnLocation, SpawnRotation, SpawnParams);
 				
 				if(SpawnedActor)
 				{
-					SpawnedActor->Rename(TEXT("Amber"));
-
 					UStaticMeshComponent* MeshComponent = SpawnedActor->FindComponentByClass<UStaticMeshComponent>();
 					if (MeshComponent)
 					{

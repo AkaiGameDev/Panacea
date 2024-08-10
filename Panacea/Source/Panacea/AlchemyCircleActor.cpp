@@ -4,6 +4,7 @@
 #include "AlchemyCircleActor.h"
 
 #include "InteractiveComponent.h"
+#include "Particles/ParticleSystemComponent.h"
 
 AAlchemyCircleActor::AAlchemyCircleActor()
 {
@@ -17,6 +18,8 @@ AAlchemyCircleActor::AAlchemyCircleActor()
 
 	//draw  debug sphere
 	CollisionComponent->SetSphereRadius(50.0f);
+
+	ParticleSystemComponent = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ParticleSystemComponent"));
 }
 
 
@@ -33,17 +36,21 @@ void AAlchemyCircleActor::BeginPlay()
 
 	PlayerCharacter = Cast<APanaceaCharacter>(TempCharacter);
 
-	if (PlayerCharacter)
-	{
-		InteractiveComponent = PlayerCharacter->FindComponentByClass<UInteractiveComponent>();
-		if (!InteractiveComponent)
-		{
-			UE_LOG(LogTemp, Error, TEXT("InteractiveComponent is null in AlchemyCircleActor"));
-		}
-	}
-	else
+	if (!PlayerCharacter)
 	{
 		UE_LOG(LogTemp, Error, TEXT("PlayerCharacter is null in AlchemyCircleActor"));
+	}
+
+	InteractiveComponent = PlayerCharacter->FindComponentByClass<UInteractiveComponent>();
+	if (!InteractiveComponent)
+	{
+		UE_LOG(LogTemp, Error, TEXT("InteractiveComponent is null in AlchemyCircleActor"));
+	}
+
+	if (ParticleSystemComponent)
+	{
+		ParticleSystemComponent->DeactivateSystem();
+		ParticleSystemComponent->SetWorldLocation(GetActorLocation());
 	}
 }
 
@@ -63,6 +70,9 @@ void AAlchemyCircleActor::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AA
 			Ingredient->SetNotInteractable();
 			InteractiveComponent->HideActor(Ingredient);
 			Broadcast();
+
+			if (ParticleSystemComponent)
+				ParticleSystemComponent->ActivateSystem();
 		}
 	}
 }
