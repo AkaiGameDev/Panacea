@@ -118,6 +118,11 @@ void ANoteActor::OpenNote()
 	}
 
 	NoteWidget->SetNoteActor(this);
+	
+	if (NoteImage) {
+		NoteWidget->NoteImage = NoteImage;
+	}
+
 	// Add the widget to the viewport
 	NoteWidget->AddToViewport();
 
