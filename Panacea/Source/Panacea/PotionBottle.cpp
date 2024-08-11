@@ -52,7 +52,7 @@ void APotionBottle::OnComponentFracture(const FChaosBreakEvent& BreakEvent)
 	{
 		bIsBreaked = true;
 
-		
+
 
 		Interact();
 		SetNotInteractable();
@@ -70,13 +70,16 @@ void APotionBottle::OnComponentFracture(const FChaosBreakEvent& BreakEvent)
 				// Get the location and rotation of the current actor
 				FVector SpawnLocation = BreakEvent.Location;
 				FRotator SpawnRotation = GetActorRotation();
-
+				FActorSpawnParameters SpawnParams;
+				SpawnParams.Name = FName(TEXT("Amber"));
 				// Spawn the new actor
-				AItem* SpawnedActor = GetWorld()->SpawnActor<AItem>(ActorToSpawn, SpawnLocation, SpawnRotation);
-				
-				if(SpawnedActor)
+				AItem* SpawnedActor = GetWorld()->SpawnActor<AItem>(ActorToSpawn, SpawnLocation, SpawnRotation, SpawnParams);
+
+				if (SpawnedActor)
 				{
-					SpawnedActor->Rename(TEXT("Amber"));
+					#if WITH_EDITOR
+						SpawnedActor->SetActorLabel(TEXT("Amber"));
+					#endif
 
 					UStaticMeshComponent* MeshComponent = SpawnedActor->FindComponentByClass<UStaticMeshComponent>();
 					if (MeshComponent)
@@ -109,12 +112,12 @@ void APotionBottle::OnComponentReleased(UPrimitiveComponent* ReleasedComponent)
 	}
 
 	FVector Start = StaticMeshComponent->GetComponentLocation();
-	FVector End = Start - FVector(0.0f, 0.0f, BreakableDistance); 
+	FVector End = Start - FVector(0.0f, 0.0f, BreakableDistance);
 
 	FVector Origin, BoxBounds;
 	StaticMeshComponent->GetLocalBounds(Origin, BoxBounds);
 	FVector ActorScale = StaticMeshComponent->GetComponentScale();
-	FVector BoxExtent = BoxBounds * ActorScale; 
+	FVector BoxExtent = BoxBounds * ActorScale;
 	BoxExtent.Z /= 2.0f;
 	FCollisionShape Box = FCollisionShape::MakeBox(BoxExtent);
 	FHitResult HitResult;

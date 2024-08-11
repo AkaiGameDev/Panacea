@@ -83,8 +83,6 @@ class APanaceaCharacter : public ACharacter
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	UInputAction* InteractAction;
 	
-
-
 public:
 	APanaceaCharacter();
 
@@ -113,7 +111,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 	TSubclassOf<UUserWidget> HintInteractionWidgetClass;
 
+	UPROPERTY()
 	UUserWidget* CrosshairWidget;
+	
 	UPROPERTY()
 	UInteractionHintWidget* HintInteractionWidget;
 
@@ -133,7 +133,13 @@ public:
 	
 	/** Returns DefaultMappingContext subobject **/
 	UInputMappingContext* GetDefaultMappingContext() const { return DefaultMappingContext; }
-
+	
+	UFUNCTION(BlueprintCallable)
 	UUserWidget* GetCrosshairWidget() const;
+	
+	UFUNCTION(BlueprintCallable)
 	UInteractionHintWidget* GetHintInteractionWidget() const;
+
+	UFUNCTION(BlueprintCallable)
+	void ShowWidgets() const;
 };

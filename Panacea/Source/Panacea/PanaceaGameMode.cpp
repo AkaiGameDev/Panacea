@@ -5,6 +5,7 @@
 #include "UObject/ConstructorHelpers.h"
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
+#include "PhilosophersStoneActor.h"
 
 APanaceaGameMode::APanaceaGameMode()
 	: Super()
@@ -79,18 +80,14 @@ void APanaceaGameMode::BroadcastOnItemInteracted(const FString& IngredientName)
 
 void APanaceaGameMode::CheckGoodEnding()
 {
-	//if (IngredientNames.Num() > 1)
-	//{
-	//	if (GoodEndingWidgetClass)
-	//	{
-	//		// Create the widget and add it to the viewport
-	//		GoodEndingWidgetInstance = CreateWidget<UUserWidget>(GetWorld(), GoodEndingWidgetClass);
-	//		if (GoodEndingWidgetInstance)
-	//		{
-	//			GoodEndingWidgetInstance->AddToViewport();
-	//		}
-	//	}
-	//}
+	if (IngredientNames.Contains("Amber_AlchemyCircle") && IngredientNames.Contains("Hair_AlchemyCircle") && IngredientNames.Contains("Mushroom_AlchemyCircle"))
+	{
+		APhilosophersStoneActor* PhilosophersStone = Cast<APhilosophersStoneActor>(UGameplayStatics::GetActorOfClass(GetWorld(), APhilosophersStoneActor::StaticClass()));
+		if (PhilosophersStone)
+		{
+			PhilosophersStone->Enable();
+		}
+	}
 }
 
 bool APanaceaGameMode::CheckBadEnding(const FString& IngredientName)
