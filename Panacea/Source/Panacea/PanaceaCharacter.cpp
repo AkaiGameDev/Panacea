@@ -66,7 +66,6 @@ void APanaceaCharacter::BeginPlay()
 			if (CrosshairWidget)
 			{
 				CrosshairWidget->AddToViewport(0);
-				CrosshairWidget->SetVisibility(ESlateVisibility::Hidden);
 				//UE_LOG(LogTemp, Warning, TEXT("Crosshair widget created"));
 			}
 			else
@@ -87,7 +86,6 @@ void APanaceaCharacter::BeginPlay()
 		if (HintInteractionWidget)
 		{
 			HintInteractionWidget->AddToViewport();
-			HintInteractionWidget->SetVisibility(ESlateVisibility::Hidden);
 			//UE_LOG(LogTemp, Warning, TEXT("Hint Interaction widget created"));
 		}
 		else
