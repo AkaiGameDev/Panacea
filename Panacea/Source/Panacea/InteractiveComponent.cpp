@@ -68,7 +68,7 @@ void UInteractiveComponent::BeginPlay()
 	}
 
 	InteractiveCapsuleCollider->AttachToComponent(RootComp, FAttachmentTransformRules::KeepRelativeTransform);
-	InteractiveCapsuleCollider->SetRelativeLocation(FVector::ForwardVector * 130.0f);
+	InteractiveCapsuleCollider->SetRelativeLocation(FVector::ForwardVector * 50.0f);
 	InteractiveCapsuleCollider->SetRelativeRotation(FRotator(90.0f, 0.0f, 0.0f));
 
 	if (HintInteractionWidget)
