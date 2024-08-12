@@ -47,7 +47,7 @@ void APhilosophersStoneActor::BeginPlay()
 void APhilosophersStoneActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	UE_LOG(LogTemp, Warning, TEXT("Enters tick of philo stone"));
 	if (bEnabled)
 	{
 		MoveStone(DeltaTime);
@@ -97,18 +97,15 @@ void APhilosophersStoneActor::Broadcast()
 
 void APhilosophersStoneActor::Enable()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Enters enable"));
 	bEnabled = true;
 	StoneMeshComponent->SetVisibility(true);
-	UE_LOG(LogTemp, Warning, TEXT("Visibility set"));
 	SetInteractable();
-	UE_LOG(LogTemp, Warning, TEXT("Interactable set"));
-	Broadcast();
+	//Broadcast();
 }
 
 void APhilosophersStoneActor::MoveStone(float DeltaTime)
 {
-
+	UE_LOG(LogTemp, Warning, TEXT("MoveStone"));
 	if ((GetActorLocation().Z - InitialLocation.Z) > MaxHeight)
 	{
 		return;
