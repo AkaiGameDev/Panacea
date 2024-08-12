@@ -65,7 +65,6 @@ void AAlchemyCircleActor::BeginPlay()
 		ParticleSystemComponent->SetWorldLocation(GetActorLocation());
 	}
 
-	PossibleActorToPlace = FindActorByName(GetWorld(), FName(IngredientNameToPlace));
 }
 
 void AAlchemyCircleActor::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
@@ -124,17 +123,4 @@ void AAlchemyCircleActor::Tick(float DeltaTime)
 		UE_LOG(LogTemp, Warning, TEXT("Not glow"));
 
 	}
-}
-
-AActor* AAlchemyCircleActor::FindActorByName(UWorld* World, FName ActorName)
-{
-	for (TActorIterator<AActor> It(World); It; ++It)
-	{
-		AActor* Actor = *It;
-		if (Actor->GetActorNameOrLabel() == ActorName)
-		{
-			return Actor;
-		}
-	}
-	return nullptr; // Actor not found
 }

@@ -54,9 +54,5 @@ private:
 	UPROPERTY()
 	UInteractiveComponent* InteractiveComponent;
 
-	AActor* FindActorByName(UWorld* World, FName ActorName);
-
-	AActor* PossibleActorToPlace;
-
 	bool bIsGlowing;
 };
