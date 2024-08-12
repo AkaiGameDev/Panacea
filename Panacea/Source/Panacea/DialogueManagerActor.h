@@ -32,6 +32,9 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* DialogueTextBlock;
 
+	UPROPERTY(EditAnywhere)
+	float TimeShow;
+
 public:
 
 	UFUNCTION()

@@ -12,7 +12,7 @@ AChestActor::AChestActor()
 
 	DefaultSceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("DefaultSceneRoot"));
 	RootComponent = DefaultSceneRoot;
-	
+
 	// Create and initialize StaticMeshComponent
 	BottomStaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BottomStaticMeshComponent"));
 	BottomStaticMeshComponent->SetupAttachment(RootComponent);
@@ -36,6 +36,9 @@ void AChestActor::BeginPlay()
 	OriginalAngleVector = TopStaticMeshComponent->GetComponentRotation().Vector();
 
 	ACharacter* Character = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+	if (!Character)
+		return;
+
 	InteractiveComponent = Character->GetComponentByClass<UInteractiveComponent>();
 }
 

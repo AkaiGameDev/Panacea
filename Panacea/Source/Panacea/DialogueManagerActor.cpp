@@ -11,6 +11,7 @@
 // Sets default values
 ADialogueManagerActor::ADialogueManagerActor()
 {
+	TimeShow = 15.0f;
 }
 
 // Called when the game starts or when spawned
@@ -94,5 +95,5 @@ void ADialogueManagerActor::ShowDialogue(const FString& ItemName)
 			{
 				DialogueWidget->SetVisibility(ESlateVisibility::Hidden);
 			}
-		}, 5.0f, false);
+		}, TimeShow, false);
 }

@@ -33,6 +33,9 @@ void AChairActor::BeginPlay()
 	OriginalLocation = StaticMeshComponent->GetComponentLocation();
 
 	ACharacter* Character = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+	if (!Character)
+		return;
+
 	InteractiveComponent = Character->GetComponentByClass<UInteractiveComponent>();
 }
 
