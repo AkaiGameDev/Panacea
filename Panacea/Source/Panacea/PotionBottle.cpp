@@ -90,6 +90,12 @@ void APotionBottle::OnComponentFracture(const FChaosBreakEvent& BreakEvent)
 		{
 			InteractiveComponent->ResetActorInFocus(this);
 
+
+			if (MetaSoundAudioComponent)
+			{
+				MetaSoundAudioComponent->Play();
+			}
+
 			if (bHasAmber && ActorToSpawn)
 			{
 				Broadcast();
@@ -119,10 +125,6 @@ void APotionBottle::OnComponentFracture(const FChaosBreakEvent& BreakEvent)
 
 					SpawnedActor->Interactable = true;
 
-					if (MetaSoundAudioComponent)
-					{
-						MetaSoundAudioComponent->Play();
-					}
 				}
 
 			}

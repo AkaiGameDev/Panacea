@@ -14,7 +14,7 @@ APhilosophersStoneActor::APhilosophersStoneActor()
 // Called when the game starts or when spawned
 void APhilosophersStoneActor::BeginPlay()
 {
-	//Super::BeginPlay();
+	Super::BeginPlay();
 
 
 	StoneMeshComponent = Cast<UStaticMeshComponent>(GetComponentByClass(UStaticMeshComponent::StaticClass()));
@@ -39,7 +39,7 @@ void APhilosophersStoneActor::BeginPlay()
 	// Set this actor to call Tick() every frame. You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	GameMode->OnItemInteractedDelegate.AddDynamic(this, &APhilosophersStoneActor::NoteRead);
-	GameMode->OnItemInteractedDelegate.AddDynamic(this, &AItem::CheckInteractable);
+	//GameMode->OnItemInteractedDelegate.AddDynamic(this, &AItem::CheckInteractable);
 	//Enable();
 }
 
@@ -47,7 +47,7 @@ void APhilosophersStoneActor::BeginPlay()
 void APhilosophersStoneActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	UE_LOG(LogTemp, Warning, TEXT("Enters tick of philo stone"));
+
 	if (bEnabled)
 	{
 		MoveStone(DeltaTime);
@@ -100,20 +100,21 @@ void APhilosophersStoneActor::Enable()
 	bEnabled = true;
 	StoneMeshComponent->SetVisibility(true);
 	SetInteractable();
-	//Broadcast();
 }
 
 void APhilosophersStoneActor::MoveStone(float DeltaTime)
 {
-	UE_LOG(LogTemp, Warning, TEXT("MoveStone"));
-	if ((GetActorLocation().Z - InitialLocation.Z) > MaxHeight)
-	{
+	if (bHasReachedDestination)
 		return;
-	}
 
 	FVector NewLocation = GetActorLocation();
 	NewLocation.Z += Speed * DeltaTime;
 	SetActorLocation(NewLocation);
+
+	if ((GetActorLocation().Z - InitialLocation.Z) > MaxHeight)
+	{
+		bHasReachedDestination = true;
+	}
 }
 
 void APhilosophersStoneActor::NoteRead(const FString& itemInteracted)

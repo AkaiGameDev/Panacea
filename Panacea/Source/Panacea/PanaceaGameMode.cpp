@@ -30,8 +30,6 @@ void APanaceaGameMode::RecordItemInteraction(const FString& ItemName)
 {
 	ItemNames.Add(ItemName);
 
-	//UE_LOG(LogTemp, Warning, TEXT("WORKS"));
-
 	for (auto Item : ItemNames)
 	{
 
@@ -69,10 +67,11 @@ void APanaceaGameMode::CheckGoodEnding()
 	if (ItemNames.Contains("Amber_AlchemyCircle") && ItemNames.Contains("Hair_AlchemyCircle") && ItemNames.Contains("Mushroom_AlchemyCircle"))
 	{
 		APhilosophersStoneActor* PhilosophersStone = Cast<APhilosophersStoneActor>(UGameplayStatics::GetActorOfClass(GetWorld(), APhilosophersStoneActor::StaticClass()));
-		if (PhilosophersStone)
+		if (PhilosophersStone && !PhilosophersStone->GetIsEnabled())
 		{
-			BroadcastOnItemInteracted("StoneCreated");
 			PhilosophersStone->Enable();
+			BroadcastOnItemInteracted("StoneCreated");
+		
 		}
 	}
 }

@@ -37,6 +37,8 @@ public:
 	UPROPERTY()
 	UUserWidget* EndingCutSceneWidget;
 
+	bool GetIsEnabled() const { return bEnabled; }
+
 private:
 	UPROPERTY()
 	UStaticMeshComponent* StoneMeshComponent;
@@ -55,6 +57,8 @@ private:
 	UPROPERTY(EditAnywhere)
 	bool bEnabled = false;
 
+	UPROPERTY(EditAnywhere)
+	bool bHasReachedDestination = false;
 
 	UFUNCTION()
 	void MoveStone(float DeltaTime);
