@@ -2,6 +2,9 @@
 #include "MouseDragObjectsComponent.h"
 #include "SwitchComponent.h"
 #include "InteractiveComponent.h"
+#include "MetasoundSource.h"
+#include "Components/AudioComponent.h"
+#include "Sound/SoundBase.h"
 
 APotionBottle::APotionBottle()
 {
@@ -24,6 +27,9 @@ APotionBottle::APotionBottle()
 
 	SwitchComponent = CreateDefaultSubobject<USwitchComponent>(TEXT("SwitchComponent"));
 	SwitchComponent->SetupAttachment(RootComponent);
+
+	MetaSoundAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("MetaSoundAudioComponent"));
+	MetaSoundAudioComponent->SetupAttachment(RootComponent);
 }
 
 
@@ -50,6 +56,11 @@ void APotionBottle::BeginPlay()
 	}
 
 	InteractiveComponent = Character->GetComponentByClass<UInteractiveComponent>();
+
+	if (MetaSoundSource)
+	{
+		MetaSoundAudioComponent->SetSound(MetaSoundSource);
+	}
 }
 
 void APotionBottle::Tick(float DeltaTime)
@@ -108,11 +119,10 @@ void APotionBottle::OnComponentFracture(const FChaosBreakEvent& BreakEvent)
 
 					SpawnedActor->Interactable = true;
 
-					/*APanaceaGameMode* GameMode = Cast<APanaceaGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-					if (GameMode)
+					if (MetaSoundAudioComponent)
 					{
-						GameMode->OnIngredientAdded.Broadcast(SpawnedActor->GetActorNameOrLabel());
-					}*/
+						MetaSoundAudioComponent->Play();
+					}
 				}
 
 			}
