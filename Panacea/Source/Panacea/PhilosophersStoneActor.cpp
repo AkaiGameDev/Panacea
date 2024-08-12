@@ -61,7 +61,7 @@ void APhilosophersStoneActor::Enable()
 {
 	bEnabled = true;
 	StoneMeshComponent->SetVisibility(true);
-	SetInteractable();
+	//SetInteractable();
 	Broadcast();
 }
 
