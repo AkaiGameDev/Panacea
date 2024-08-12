@@ -126,16 +126,19 @@ void APotionBottle::OnComponentReleased(UPrimitiveComponent* ReleasedComponent)
 		return;
 	}
 
-	FVector Start = StaticMeshComponent->GetComponentLocation();
-	FVector End = Start - FVector(0.0f, 0.0f, BreakableDistance);
-
 	FVector Origin, BoxBounds;
 	StaticMeshComponent->GetLocalBounds(Origin, BoxBounds);
 	FVector ActorScale = StaticMeshComponent->GetComponentScale();
 	FVector BoxExtent = BoxBounds * ActorScale;
+	BoxExtent.X += 20.0f;
+	BoxExtent.Y += 20.0f;
 	BoxExtent.Z /= 2.0f;
 	FCollisionShape Box = FCollisionShape::MakeBox(BoxExtent);
 	FHitResult HitResult;
+	
+	FVector Start = StaticMeshComponent->GetComponentLocation();
+	Start.Z += BoxExtent.Z;
+	FVector End = Start - FVector(0.0f, 0.0f, BreakableDistance);
 
 	ACharacter* Character = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 	FCollisionQueryParams QueryParams;
