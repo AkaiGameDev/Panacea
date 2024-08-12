@@ -30,7 +30,7 @@ void APanaceaGameMode::RecordItemInteraction(const FString& ItemName)
 {
 	ItemNames.Add(ItemName);
 
-	UE_LOG(LogTemp, Warning, TEXT("WORKS"));
+	//UE_LOG(LogTemp, Warning, TEXT("WORKS"));
 
 	for (auto Item : ItemNames)
 	{
