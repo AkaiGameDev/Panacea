@@ -94,8 +94,6 @@ void AAlchemyCircleActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	UE_LOG(LogTemp, Warning, TEXT("Works"));
-
 	if (InteractiveComponent &&
 		InteractiveComponent->bIsHolding &&
 		InteractiveComponent->GetActorInFocus()->GetActorNameOrLabel() == IngredientNameToPlace)
@@ -108,8 +106,6 @@ void AAlchemyCircleActor::Tick(float DeltaTime)
 
 		bIsGlowing = true;
 
-		UE_LOG(LogTemp, Warning, TEXT("Glow"));
-
 	}
 	else
 	{
@@ -119,8 +115,6 @@ void AAlchemyCircleActor::Tick(float DeltaTime)
 		StaticMeshComponent->SetRenderCustomDepth(false);
 		
 		bIsGlowing = false;
-	
-		UE_LOG(LogTemp, Warning, TEXT("Not glow"));
 
 	}
 }
