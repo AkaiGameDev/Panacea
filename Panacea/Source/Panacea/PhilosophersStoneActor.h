@@ -26,6 +26,8 @@ public:
 
 	virtual void Interact() override;
 
+	virtual void Broadcast() override;
+
 	UFUNCTION()
 	void Enable();
 
@@ -41,6 +43,9 @@ private:
 	UPROPERTY()
 	FVector InitialLocation;
 
+	UPROPERTY()
+	bool HasReadNote = false;
+
 	UPROPERTY(EditAnywhere)
 	float Speed = 10.0f;
 
@@ -53,5 +58,8 @@ private:
 
 	UFUNCTION()
 	void MoveStone(float DeltaTime);
+
+	UFUNCTION()
+	void NoteRead(const FString& itemInteracted);
 
 };
