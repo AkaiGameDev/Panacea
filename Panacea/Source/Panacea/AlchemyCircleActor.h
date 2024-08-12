@@ -9,7 +9,9 @@
 #include "PanaceaCharacter.h"
 #include "AlchemyCircleActor.generated.h"
 
-class UParticleSystemComponent;
+class UNiagaraSystem;
+class UAudioComponent;
+class UMetaSoundSource;
 
 /**
  * 
@@ -34,9 +36,15 @@ public:
 	UPROPERTY(EditAnywhere,Category="Config")
 	FString IngredientNameToPlace;
 
-	// The particle system component
-	UPROPERTY(VisibleAnywhere, Category = "Effects")
-	UParticleSystemComponent* ParticleSystemComponent;
+	// The Niagara system asset
+	UPROPERTY(EditAnywhere, Category = "Effects")
+	UNiagaraSystem* NiagaraSystem;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "Audio")
+	UAudioComponent* MetaSoundAudioComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Audio")
+	UMetaSoundSource* MetaSoundSource;
 
 	UFUNCTION()
 	virtual void BeginPlay() override;
