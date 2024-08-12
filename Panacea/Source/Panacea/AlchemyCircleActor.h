@@ -25,6 +25,12 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	USphereComponent* CollisionComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	USceneComponent* DefaultSceneRoot;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
+	UStaticMeshComponent* StaticMeshComponent;
+
 	UPROPERTY(EditAnywhere,Category="Config")
 	FString IngredientNameToPlace;
 
@@ -40,11 +46,17 @@ public:
 	void OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor,
 		class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
+	virtual void Tick(float DeltaTime) override;
+
 private:
 	UPROPERTY()
 	APanaceaCharacter* PlayerCharacter;
 	UPROPERTY()
 	UInteractiveComponent* InteractiveComponent;
 
+	AActor* FindActorByName(UWorld* World, FName ActorName);
 
+	AActor* PossibleActorToPlace;
+
+	bool bIsGlowing;
 };
