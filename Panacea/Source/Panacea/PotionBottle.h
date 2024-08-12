@@ -9,6 +9,8 @@
 
 class USwitchComponent;
 class UInteractiveComponent;
+class UMetaSoundSource;
+class UAudioComponent;
 
 UCLASS()
 class PANACEA_API APotionBottle : public AItem
@@ -31,6 +33,12 @@ public:
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	USwitchComponent* SwitchComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "Audio")
+	UAudioComponent* MetaSoundAudioComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Audio")
+	UMetaSoundSource* MetaSoundSource;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AItem> ActorToSpawn;

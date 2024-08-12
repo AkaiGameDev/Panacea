@@ -18,7 +18,8 @@ public class Panacea : ModuleRules
             "PhysicsCore",
             "Chaos",
             "GeometryCollectionEngine",
-            "MetasoundEngine"
+            "MetasoundEngine",
+            "Niagara"
         });
 
         PublicIncludePaths.AddRange(

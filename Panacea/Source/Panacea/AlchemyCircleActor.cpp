@@ -4,8 +4,12 @@
 #include "AlchemyCircleActor.h"
 
 #include "InteractiveComponent.h"
-#include "Particles/ParticleSystemComponent.h"
 #include "EngineUtils.h" 
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraComponent.h"
+#include "MetasoundSource.h"
+#include "Components/AudioComponent.h"
+#include "Sound/SoundBase.h"
 
 AAlchemyCircleActor::AAlchemyCircleActor()
 {
@@ -31,7 +35,8 @@ AAlchemyCircleActor::AAlchemyCircleActor()
 	//draw  debug sphere
 	CollisionComponent->SetSphereRadius(50.0f);
 
-	ParticleSystemComponent = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ParticleSystemComponent"));
+	MetaSoundAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("MetaSoundAudioComponent"));
+	MetaSoundAudioComponent->SetupAttachment(RootComponent);
 }
 
 
@@ -59,12 +64,11 @@ void AAlchemyCircleActor::BeginPlay()
 		UE_LOG(LogTemp, Error, TEXT("InteractiveComponent is null in AlchemyCircleActor"));
 	}
 
-	if (ParticleSystemComponent)
-	{
-		ParticleSystemComponent->DeactivateSystem();
-		ParticleSystemComponent->SetWorldLocation(GetActorLocation());
-	}
 
+	if (MetaSoundSource)
+	{
+		MetaSoundAudioComponent->SetSound(MetaSoundSource);
+	}
 }
 
 void AAlchemyCircleActor::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
@@ -84,8 +88,15 @@ void AAlchemyCircleActor::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AA
 			InteractiveComponent->HideActor(Ingredient);
 			Broadcast();
 
-			if (ParticleSystemComponent)
-				ParticleSystemComponent->ActivateSystem();
+			if (NiagaraSystem)
+			{
+				UNiagaraComponent* NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAttached(NiagaraSystem, DefaultSceneRoot, NAME_None, FVector(0.f), FRotator(0.f), EAttachLocation::Type::KeepRelativeOffset, true);
+			}
+
+			if (MetaSoundAudioComponent)
+			{
+				MetaSoundAudioComponent->Play();
+			}
 		}
 	}
 }
@@ -113,7 +124,7 @@ void AAlchemyCircleActor::Tick(float DeltaTime)
 			return;
 
 		StaticMeshComponent->SetRenderCustomDepth(false);
-		
+
 		bIsGlowing = false;
 
 	}
