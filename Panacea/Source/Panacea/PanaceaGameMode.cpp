@@ -71,6 +71,7 @@ void APanaceaGameMode::CheckGoodEnding()
 		APhilosophersStoneActor* PhilosophersStone = Cast<APhilosophersStoneActor>(UGameplayStatics::GetActorOfClass(GetWorld(), APhilosophersStoneActor::StaticClass()));
 		if (PhilosophersStone)
 		{
+			BroadcastOnItemInteracted("StoneCreated");
 			PhilosophersStone->Enable();
 		}
 	}
