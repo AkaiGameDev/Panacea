@@ -23,22 +23,7 @@ void APanaceaGameMode::BeginPlay()
 	Super::BeginPlay();
 
 	OnItemInteractedDelegate.AddDynamic(this, &APanaceaGameMode::RecordItemInteraction); //change this to a new function to record items interacted w
-	OnIngredientAdded.AddDynamic(this, &APanaceaGameMode::RecordIngredient);
 	OnBadEnding.AddDynamic(this, &APanaceaGameMode::OnBadEndingSequence);
-}
-
-void APanaceaGameMode::RecordIngredient(const FString& IngredientName)
-{
-	IngredientNames.Add(IngredientName);
-
-	UE_LOG(LogTemp, Warning, TEXT("Ingredient Added: %s"), *IngredientName);
-
-	if (CheckBadEnding(IngredientName))
-	{
-		OnBadEnding.Broadcast();
-	}
-	else
-		CheckGoodEnding();
 }
 
 void APanaceaGameMode::RecordItemInteraction(const FString& ItemName)
@@ -53,6 +38,7 @@ void APanaceaGameMode::RecordItemInteraction(const FString& ItemName)
 		UE_LOG(LogTemp, Warning, TEXT("ITEMS: %s"), *Item);
 	}
 
+	CheckGoodEnding();
 }
 
 void APanaceaGameMode::OnBadEndingSequence()
@@ -80,7 +66,7 @@ void APanaceaGameMode::BroadcastOnItemInteracted(const FString& IngredientName)
 
 void APanaceaGameMode::CheckGoodEnding()
 {
-	if (IngredientNames.Contains("Amber_AlchemyCircle") && IngredientNames.Contains("Hair_AlchemyCircle") && IngredientNames.Contains("Mushroom_AlchemyCircle"))
+	if (ItemNames.Contains("Amber_AlchemyCircle") && ItemNames.Contains("Hair_AlchemyCircle") && ItemNames.Contains("Mushroom_AlchemyCircle"))
 	{
 		APhilosophersStoneActor* PhilosophersStone = Cast<APhilosophersStoneActor>(UGameplayStatics::GetActorOfClass(GetWorld(), APhilosophersStoneActor::StaticClass()));
 		if (PhilosophersStone)

@@ -46,10 +46,6 @@ public:
 
 	// Function to record the ingredient
 	UFUNCTION()
-	void RecordIngredient(const FString& IngredientName);
-
-	// Function to record the ingredient
-	UFUNCTION()
 	void RecordItemInteraction(const FString& ItemName);
 
 	// Function to start Bad ending sequence

@@ -31,6 +31,9 @@ void ACrossActor::BeginPlay()
 	OriginalAngleVector = StaticMeshComponent->GetComponentRotation().Vector();
 
 	ACharacter* Character = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+	if (!Character)
+		return;
+
 	InteractiveComponent = Character->GetComponentByClass<UInteractiveComponent>();
 }
 

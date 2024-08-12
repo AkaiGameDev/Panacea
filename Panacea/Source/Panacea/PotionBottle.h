@@ -8,6 +8,7 @@
 #include "PotionBottle.generated.h"
 
 class USwitchComponent;
+class UInteractiveComponent;
 
 UCLASS()
 class PANACEA_API APotionBottle : public AItem
@@ -40,6 +41,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	bool bHasAmber;
 
+	virtual void Tick(float DeltaTime) override;
 protected:
 	virtual void BeginPlay() override;
 
@@ -51,4 +53,6 @@ private:
 	void OnComponentReleased(UPrimitiveComponent* ReleasedComponent);
 
 	bool bIsBreaked;
+
+	UInteractiveComponent* InteractiveComponent;
 };

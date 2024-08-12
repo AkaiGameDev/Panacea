@@ -66,6 +66,8 @@ void APanaceaCharacter::BeginPlay()
 			if (CrosshairWidget)
 			{
 				CrosshairWidget->AddToViewport(0);
+				CrosshairWidget->SetVisibility(ESlateVisibility::Hidden);
+
 				//UE_LOG(LogTemp, Warning, TEXT("Crosshair widget created"));
 			}
 			else

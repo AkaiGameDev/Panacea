@@ -12,6 +12,7 @@
 #include "Camera/CameraComponent.h"  // Ensure this is included
 #include "Item.h"
 #include "GeometryCollection/GeometryCollectionComponent.h"
+#include "EngineUtils.h" 
 
 UInteractiveComponent::UInteractiveComponent()
 {
@@ -68,7 +69,7 @@ void UInteractiveComponent::BeginPlay()
 	}
 
 	InteractiveCapsuleCollider->AttachToComponent(RootComp, FAttachmentTransformRules::KeepRelativeTransform);
-	InteractiveCapsuleCollider->SetRelativeLocation(FVector::ForwardVector * 50.0f);
+	InteractiveCapsuleCollider->SetRelativeLocation(FVector::ForwardVector * 130.0f);
 	InteractiveCapsuleCollider->SetRelativeRotation(FRotator(90.0f, 0.0f, 0.0f));
 
 	if (HintInteractionWidget)
@@ -83,7 +84,7 @@ void UInteractiveComponent::BeginPlay()
 }
 
 void UInteractiveComponent::TickComponent(float DeltaTime, ELevelTick TickType,
-                                          FActorComponentTickFunction* ThisTickFunction)
+	FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
@@ -96,8 +97,8 @@ void UInteractiveComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 }
 
 void UInteractiveComponent::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-                                           UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
-                                           const FHitResult& SweepResult)
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+	const FHitResult& SweepResult)
 {
 	if (Cast<IInteractable>(OtherActor) != nullptr)
 	{
@@ -140,7 +141,7 @@ void UInteractiveComponent::OnOverlapBegin(UPrimitiveComponent* OverlappedCompon
 }
 
 void UInteractiveComponent::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-                                         UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	if (IInteractable* Interactable = Cast<IInteractable>(OtherActor))
 	{
@@ -262,7 +263,7 @@ void UInteractiveComponent::Release()
 }
 
 bool UInteractiveComponent::IsPathClear(const FVector& StartLocation, const FVector& EndLocation,
-                                        const FVector& BoxExtent) const
+	const FVector& BoxExtent) const
 {
 	FCollisionShape Box = FCollisionShape::MakeBox(BoxExtent);
 	FHitResult HitResult;
@@ -305,7 +306,7 @@ void UInteractiveComponent::OnMoveItemComplete()
 		if (CharacterCameraComponent && ActorInFocusRootComponent && ActorInFocusInteractable)
 		{
 			ActorInFocusRootComponent->AttachToComponent(CharacterCameraComponent,
-			                                             FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+				FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 
 			ActorInFocusInteractable->OnInteractableOutOfRange();
 		}
@@ -363,18 +364,33 @@ AActor* UInteractiveComponent::GetClosestToOwner(const TArray<AActor*>& ActorsTo
 
 			FVector Start = CharacterCameraComponent->GetComponentLocation();
 			FVector End = StaticMesh
-				              ? End = StaticMesh->GetComponentLocation()
-				              : End = InteractableActor->GetActorLocation();
+				? End = StaticMesh->GetComponentLocation()
+				: End = InteractableActor->GetActorLocation();
 
 			FHitResult HitResult;
 
 			FCollisionQueryParams QueryParams;
 			QueryParams.AddIgnoredActor(Owner);
 
-			UGeometryCollectionComponent* GeometryCollection = InteractableActor->GetComponentByClass<
-				UGeometryCollectionComponent>();
+			UGeometryCollectionComponent* GeometryCollection = InteractableActor->GetComponentByClass<UGeometryCollectionComponent>();
 			if (GeometryCollection)
+			{
 				QueryParams.AddIgnoredComponent(GeometryCollection);
+			}
+
+			for (TActorIterator<AActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
+			{
+				AActor* Actor = *ActorItr;
+				if (Actor)
+				{
+					UActorComponent* GeometryCollectionComponentRaw = Actor->GetComponentByClass(UGeometryCollectionComponent::StaticClass());
+					UGeometryCollectionComponent* GeometryCollectionComponent = Cast<UGeometryCollectionComponent>(GeometryCollectionComponentRaw);
+					if (GeometryCollectionComponent)
+					{
+						QueryParams.AddIgnoredComponent(GeometryCollectionComponent);
+					}
+				}
+			}
 
 			// Perform the line trace
 			bool bHit = GetWorld()->LineTraceSingleByChannel(
@@ -465,7 +481,7 @@ void UInteractiveComponent::HideActor(AActor* ActorToHide)
 }
 
 void UInteractiveComponent::SetAndStartMovement(const FVector& TargetVector, const FRotator& TargetRotator,
-                                                bool bIsRelease)
+	bool bIsRelease)
 {
 	if (ActorInFocusRootComponent)
 	{
@@ -484,7 +500,7 @@ void UInteractiveComponent::SetAndStartMovement(const FVector& TargetVector, con
 			}
 
 			ActorInFocusRootComponent->AttachToComponent(CharacterCameraComponent,
-			                                             FAttachmentTransformRules::KeepWorldTransform);
+				FAttachmentTransformRules::KeepWorldTransform);
 		}
 
 		bIsMovingToTarget = true;
@@ -494,11 +510,11 @@ void UInteractiveComponent::SetAndStartMovement(const FVector& TargetVector, con
 void UInteractiveComponent::OnTickUpdateItemTransform(float DeltaTime)
 {
 	FVector CurrentLocation = bIsHolding
-		                          ? ActorInFocusRootComponent->GetComponentLocation()
-		                          : ActorInFocusRootComponent->GetRelativeLocation();
+		? ActorInFocusRootComponent->GetComponentLocation()
+		: ActorInFocusRootComponent->GetRelativeLocation();
 	FRotator CurrentRotation = bIsHolding
-		                           ? ActorInFocusRootComponent->GetComponentRotation()
-		                           : ActorInFocusRootComponent->GetRelativeRotation();
+		? ActorInFocusRootComponent->GetComponentRotation()
+		: ActorInFocusRootComponent->GetRelativeRotation();
 
 	FVector DesiredLocation = bIsHolding ? TargetLocationToRelease : GrabbedActorLocationViewport;
 	FRotator DesiredRotation = bIsHolding ? TargetRotationToRelease : GrabbedActorRotationViewport;
@@ -519,7 +535,7 @@ void UInteractiveComponent::OnTickUpdateItemTransform(float DeltaTime)
 
 	bool bLocationReached = FVector::Dist(NewLocation, DesiredLocation) < 1.0f;
 	bool bRotationReached = FQuat::Slerp(CurrentRotation.Quaternion(), DesiredRotation.Quaternion(),
-	                                     DeltaTime * MovementSpeed).Equals(DesiredRotation.Quaternion(), 1.0f);
+		DeltaTime * MovementSpeed).Equals(DesiredRotation.Quaternion(), 1.0f);
 
 	if (bLocationReached && bRotationReached)
 	{

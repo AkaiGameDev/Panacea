@@ -15,8 +15,7 @@ void AKeyActor::Interact()
 		if (InteractiveComponent->bIsHolding)
 			InteractiveComponent->GrabbedActorRotationViewport = FRotator::ZeroRotator;
 		else
-			InteractiveComponent->GrabbedActorRotationViewport = FRotator(0.0f, 90.0f, 90.0f);
-
+			InteractiveComponent->GrabbedActorRotationViewport = FRotator(-90.0f, -90.0f, 0.0f);
 	}
 
 

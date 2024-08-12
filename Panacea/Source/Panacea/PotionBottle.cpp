@@ -26,6 +26,7 @@ APotionBottle::APotionBottle()
 	SwitchComponent->SetupAttachment(RootComponent);
 }
 
+
 void APotionBottle::BeginPlay()
 {
 	Super::BeginPlay();
@@ -38,12 +39,31 @@ void APotionBottle::BeginPlay()
 	}
 
 	ACharacter* Character = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+	if (!Character)
+		return;
+	
 	UMouseDragObjectsComponent* MouseDragObjectsComponent = Character->GetComponentByClass<UMouseDragObjectsComponent>();
 
 	if (MouseDragObjectsComponent)
 	{
 		MouseDragObjectsComponent->OnComponentMouseRelease.AddDynamic(this, &APotionBottle::OnComponentReleased);
 	}
+
+	InteractiveComponent = Character->GetComponentByClass<UInteractiveComponent>();
+}
+
+void APotionBottle::Tick(float DeltaTime)
+{
+	if (!InteractiveComponent)
+		return;
+
+	if (InteractiveComponent->GetActorInFocus() != this)
+		return;
+
+	if (!InteractiveComponent->bIsHolding)
+		return;
+
+	OnComponentReleased(StaticMeshComponent);
 }
 
 void APotionBottle::OnComponentFracture(const FChaosBreakEvent& BreakEvent)
@@ -52,13 +72,8 @@ void APotionBottle::OnComponentFracture(const FChaosBreakEvent& BreakEvent)
 	{
 		bIsBreaked = true;
 
-
-
 		Interact();
 		SetNotInteractable();
-
-		ACharacter* Character = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
-		UInteractiveComponent* InteractiveComponent = Character->GetComponentByClass<UInteractiveComponent>();
 
 		if (InteractiveComponent)
 		{
@@ -171,8 +186,6 @@ void APotionBottle::Interact()
 		SwitchComponent->SwitchCamera();
 	}
 
-	ACharacter* Character = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
-	UInteractiveComponent* InteractiveComponent = Character->GetComponentByClass<UInteractiveComponent>();
 
 	if (InteractiveComponent)
 	{

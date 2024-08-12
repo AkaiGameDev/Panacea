@@ -62,6 +62,7 @@ void APhilosophersStoneActor::Enable()
 	bEnabled = true;
 	StoneMeshComponent->SetVisibility(true);
 	SetInteractable();
+	Broadcast();
 }
 
 void APhilosophersStoneActor::MoveStone(float DeltaTime)
