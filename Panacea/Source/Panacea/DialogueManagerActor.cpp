@@ -64,36 +64,55 @@ void ADialogueManagerActor::BeginPlay()
 
 void ADialogueManagerActor::ShowDialogue(const FString& ItemName)
 {
-	static const FString ContextString(TEXT("GENERAL"));
+    static const FString ContextString(TEXT("GENERAL"));
 
-	if (!MyDataTable)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("DataTable is null"));
-	}
+    if (!MyDataTable)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("DataTable is null"));
+        return;
+    }
 
-	FDialogueRowBase* row = MyDataTable->FindRow<FDialogueRowBase>(FName(ItemName), ContextString);
+    FDialogueRowBase* row = MyDataTable->FindRow<FDialogueRowBase>(FName(ItemName), ContextString);
 
-	if (!row)
-		return;
+    if (!row)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Row not found in DataTable"));
+        return;
+    }
 
-	DialogueTextBlock->SetText(FText::FromString(row->source));
+    if (DialogueTextBlock)
+    {
+        DialogueTextBlock->SetText(FText::FromString(row->source));
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("DialogueTextBlock is null"));
+        return;
+    }
 
-	if (DialogueWidget)
-		DialogueWidget->SetVisibility(ESlateVisibility::Visible);
+    if (DialogueWidget)
+    {
+        DialogueWidget->SetVisibility(ESlateVisibility::Visible);
+    }
 
-	if (!Character)
-	{
-		UE_LOG(LogTemp, Error, TEXT("Owner is not of class APanaceaCharacter"));
-		return;
-	}
+    if (!Character)
+    {
+        UE_LOG(LogTemp, Error, TEXT("Owner is not of class APanaceaCharacter"));
+        return;
+    }
 
-	Character->TriggerSoundPlay(FName(row->SoundToPlay));
+    Character->TriggerSoundPlay(FName(row->SoundToPlay));
 
-	GetWorld()->GetTimerManager().SetTimer(DialogueVisibilityTimerHandle, [this]()
-		{
-			if (DialogueWidget)
-			{
-				DialogueWidget->SetVisibility(ESlateVisibility::Hidden);
-			}
-		}, TimeShow, false);
+    // Use a weak pointer to avoid potential crashes if the actor is destroyed
+    TWeakObjectPtr<ADialogueManagerActor> WeakThis(this);
+    GetWorld()->GetTimerManager().SetTimer(DialogueVisibilityTimerHandle, [WeakThis]()
+        {
+            if (WeakThis.IsValid())
+            {
+                if (WeakThis->DialogueWidget)
+                {
+                    WeakThis->DialogueWidget->SetVisibility(ESlateVisibility::Hidden);
+                }
+            }
+        }, TimeShow, false);
 }
