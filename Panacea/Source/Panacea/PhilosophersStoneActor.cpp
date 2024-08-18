@@ -51,6 +51,8 @@ void APhilosophersStoneActor::Tick(float DeltaTime)
 	if (bEnabled)
 	{
 		MoveStone(DeltaTime);
+		if(NoteRead)
+			StoneMeshComponent->SetRenderCustomDepth(true);
 	}
 }
 
@@ -123,5 +125,6 @@ void APhilosophersStoneActor::NoteRead(const FString& itemInteracted)
 		UE_LOG(LogTemp, Warning, TEXT("Stone set to NoteRead"));
 		HasReadNote = true;
 		InteractionHintText = "\"E\" to complete stone";
+		StoneMeshComponent->SetRenderCustomDepth(true);
 	}
 }
