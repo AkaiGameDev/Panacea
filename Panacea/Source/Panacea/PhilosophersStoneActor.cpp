@@ -51,7 +51,7 @@ void APhilosophersStoneActor::Tick(float DeltaTime)
 	if (bEnabled)
 	{
 		MoveStone(DeltaTime);
-		if(NoteRead)
+		if(HasReadNote)
 			StoneMeshComponent->SetRenderCustomDepth(true);
 	}
 }
