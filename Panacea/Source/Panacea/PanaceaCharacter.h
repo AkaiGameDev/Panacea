@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
+#include "InteractionHintWidget.h"
 #include "PanaceaCharacter.generated.h"
 
 
@@ -17,6 +18,8 @@ class UMouseDragObjectsComponent;
 class UGrabbingSystemComponent;
 class UPhysicsHandleComponent;
 class UInteractiveComponent;
+class UAudioComponent;
+class UMetaSoundSource;
 struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
@@ -45,6 +48,12 @@ class APanaceaCharacter : public ACharacter
 	/** Component for handling interaction */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly,meta = (AllowPrivateAccess = "true"))
 	UInteractiveComponent* InteractiveComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "Audio")
+	UAudioComponent* MetaSoundAudioComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), Category = "Audio")
+	UMetaSoundSource* MetaSoundSource;
 
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
@@ -94,6 +103,7 @@ protected:
 	void Pause();
 
 	void Interact(const FInputActionValue& Value);
+	void JumpFunction();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 	TSubclassOf<UUserWidget> CrosshairWidgetClass;
@@ -101,8 +111,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 	TSubclassOf<UUserWidget> HintInteractionWidgetClass;
 
+	UPROPERTY()
 	UUserWidget* CrosshairWidget;
-	UUserWidget* HintInteractionWidget;
+	
+	UPROPERTY()
+	UInteractionHintWidget* HintInteractionWidget;
 
 	// APawn interface
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
@@ -110,7 +123,9 @@ protected:
 
 public:
 	/** Returns Mesh1P subobject **/
-	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
+	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P;}
+
+	void TriggerSoundPlay(const FName& TriggerParameterName);
 
 	/** Returns FirstPersonCameraComponent subobject **/
 	UFUNCTION(BlueprintCallable)
@@ -118,7 +133,13 @@ public:
 	
 	/** Returns DefaultMappingContext subobject **/
 	UInputMappingContext* GetDefaultMappingContext() const { return DefaultMappingContext; }
-
+	
+	UFUNCTION(BlueprintCallable)
 	UUserWidget* GetCrosshairWidget() const;
-	UUserWidget* GetHintInteractionWidget() const;
+	
+	UFUNCTION(BlueprintCallable)
+	UInteractionHintWidget* GetHintInteractionWidget() const;
+
+	UFUNCTION(BlueprintCallable)
+	void ShowWidgets() const;
 };

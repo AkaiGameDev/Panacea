@@ -28,32 +28,23 @@ void AChairActor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	OriginalLocation = StaticMeshComponent->GetComponentLocation();
-}
+	StaticMeshComponent->SetWorldLocation(StaticMeshComponent->GetComponentLocation() - StaticMeshComponent->GetForwardVector() * MinimumDistance);
 
-void AChairActor::Interact()
-{
-	if (!Interactable)
+	OriginalLocation = StaticMeshComponent->GetComponentLocation();
+
+	ACharacter* Character = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+	if (!Character)
 		return;
 
-	if (StaticMeshComponent)
-	{
-		StaticMeshComponent->SetSimulatePhysics(!StaticMeshComponent->IsSimulatingPhysics());
-	}
+	InteractiveComponent = Character->GetComponentByClass<UInteractiveComponent>();
+}
 
-	if (SwitchComponent)
-	{
-		SwitchComponent->SwitchCamera();
-	}
-
-	
-	ACharacter* Character = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
-	UInteractiveComponent* InteractiveComponent = Character->GetComponentByClass<UInteractiveComponent>();
-
-	if (InteractiveComponent)
-	{
-		InteractiveComponent->bIsHolding = !InteractiveComponent->bIsHolding;
-	}
+void AChairActor::Tick(float DeltaTime)
+{
+	if (!InteractiveComponent ||
+		InteractiveComponent->GetActorInFocus() != this ||
+		!InteractiveComponent->bIsHolding)
+		return;
 
 	FVector FinalLocation = StaticMeshComponent->GetComponentLocation();
 
@@ -62,9 +53,9 @@ void AChairActor::Interact()
 	UE_LOG(LogTemp, Warning, TEXT("Distance Difference : %f"), Distance);
 
 
-	// Check if the angle difference is within the desired threshold (e.g., 23 degrees)
 	if (Distance > MinimumDistance)
 	{
+		Interact();
 		Broadcast();
 		SetNotInteractable();
 
@@ -72,5 +63,38 @@ void AChairActor::Interact()
 		{
 			InteractiveComponent->ResetActorInFocus(this);
 		}
+	}
+
+}
+
+
+void AChairActor::Interact()
+{
+	if (!Interactable)
+		return;
+
+	if (StaticMeshComponent)
+	{
+		if (!StaticMeshComponent->IsSimulatingPhysics())
+		{
+			StaticMeshComponent->SetSimulatePhysics(true);
+			StaticMeshComponent->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Ignore);
+
+		}
+		else
+		{
+			StaticMeshComponent->SetSimulatePhysics(false);
+			StaticMeshComponent->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Block);
+		}
+	}
+
+	if (SwitchComponent)
+	{
+		SwitchComponent->SwitchCamera();
+	}
+
+	if (InteractiveComponent)
+	{
+		InteractiveComponent->bIsHolding = !InteractiveComponent->bIsHolding;
 	}
 }

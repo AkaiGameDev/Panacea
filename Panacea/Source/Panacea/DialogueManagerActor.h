@@ -2,10 +2,11 @@
 
 #pragma once
 
+#include "PanaceaCharacter.h"
+
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "DialogueManagerActor.generated.h"
-
 
 
 UCLASS()
@@ -31,9 +32,19 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* DialogueTextBlock;
 
+	UPROPERTY(EditAnywhere)
+	float TimeShow;
+
 public:
 
 	UFUNCTION()
 	void ShowDialogue(const FString& ItemName);
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data", meta = (AllowPrivateAccess = "true"))
+	UDataTable* MyDataTable;
+
+private:
+	FTimerHandle DialogueVisibilityTimerHandle;
+
+	APanaceaCharacter* Character;
 };

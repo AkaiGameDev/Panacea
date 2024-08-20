@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Components/CapsuleComponent.h"
-
+#include "InteractionHintWidget.h"
 #include "InputActionValue.h"
 #include "InteractiveComponent.generated.h"
 
@@ -48,6 +48,8 @@ public:
 
     UPROPERTY(EditAnywhere)
     bool bIsHolding;
+
+    AActor* GetActorInFocus() const { return ActorInFocus; }
 protected:
     // Called when the game starts
     virtual void BeginPlay() override;
@@ -94,7 +96,8 @@ private:
 
     FRotator TargetRotationToRelease;
 
-    UUserWidget* HintInteractionWidget;
+    UPROPERTY()
+    UInteractionHintWidget* HintInteractionWidget;
 
     bool bIsMovingToTarget;
 

@@ -46,10 +46,6 @@ public:
 
 	// Function to record the ingredient
 	UFUNCTION()
-	void RecordIngredient(const FString& IngredientName);
-
-	// Function to record the ingredient
-	UFUNCTION()
 	void RecordItemInteraction(const FString& ItemName);
 
 	// Function to start Bad ending sequence
@@ -63,6 +59,9 @@ public:
 	void BroadcastOnItemInteracted(const FString& IngredientName);
 
 	TArray<FString> GetItemNames() const { return ItemNames; }
+
+protected:
+	virtual void BeginPlay() override;
 
 private:
 

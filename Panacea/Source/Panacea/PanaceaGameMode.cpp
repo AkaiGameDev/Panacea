@@ -5,6 +5,7 @@
 #include "UObject/ConstructorHelpers.h"
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
+#include "PhilosophersStoneActor.h"
 
 APanaceaGameMode::APanaceaGameMode()
 	: Super()
@@ -13,36 +14,29 @@ APanaceaGameMode::APanaceaGameMode()
 	//static ConstructorHelpers::FClassFinder<APawn> PlayerPawnClassFinder(TEXT("/Game/Blueprints/BP_FirstPersonCharacter"));
 	//DefaultPawnClass = PlayerPawnClassFinder.Class;
 
-	OnIngredientAdded.AddDynamic(this, &APanaceaGameMode::RecordIngredient);
-	OnBadEnding.AddDynamic(this, &APanaceaGameMode::OnBadEndingSequence);
-	OnItemInteractedDelegate.AddDynamic(this, &APanaceaGameMode::RecordItemInteraction); //change this to a new function to record items interacted w
+	
 }
 
-void APanaceaGameMode::RecordIngredient(const FString& IngredientName)
+
+void APanaceaGameMode::BeginPlay()
 {
-	IngredientNames.Add(IngredientName);
+	Super::BeginPlay();
 
-	UE_LOG(LogTemp, Warning, TEXT("Ingredient Added: %s"), *IngredientName);
-
-	if (CheckBadEnding(IngredientName))
-	{
-		OnBadEnding.Broadcast();
-	}
-	else
-		CheckGoodEnding();
+	OnItemInteractedDelegate.AddDynamic(this, &APanaceaGameMode::RecordItemInteraction); //change this to a new function to record items interacted w
+	OnBadEnding.AddDynamic(this, &APanaceaGameMode::OnBadEndingSequence);
 }
 
 void APanaceaGameMode::RecordItemInteraction(const FString& ItemName)
 {
 	ItemNames.Add(ItemName);
 
-
 	for (auto Item : ItemNames)
 	{
 
-		UE_LOG(LogTemp, Warning, TEXT("%s"), *Item);
+		UE_LOG(LogTemp, Warning, TEXT("ITEMS: %s"), *Item);
 	}
 
+	CheckGoodEnding();
 }
 
 void APanaceaGameMode::OnBadEndingSequence()
@@ -66,21 +60,18 @@ void APanaceaGameMode::BroadcastBadEndingEvent()
 void APanaceaGameMode::BroadcastOnItemInteracted(const FString& IngredientName)
 {
 	OnItemInteractedDelegate.Broadcast(IngredientName);
-
 }
 
 void APanaceaGameMode::CheckGoodEnding()
 {
-	if (IngredientNames.Contains("Amber_AlchemyCircle") && IngredientNames.Contains("Hair_AlchemyCircle") && IngredientNames.Contains("Mushroom_AlchemyCircle"))
+	if (ItemNames.Contains("Amber_AlchemyCircle") && ItemNames.Contains("Hair_AlchemyCircle") && ItemNames.Contains("Mushroom_AlchemyCircle"))
 	{
-		if (GoodEndingWidgetClass)
+		APhilosophersStoneActor* PhilosophersStone = Cast<APhilosophersStoneActor>(UGameplayStatics::GetActorOfClass(GetWorld(), APhilosophersStoneActor::StaticClass()));
+		if (PhilosophersStone && !PhilosophersStone->GetIsEnabled())
 		{
-			// Create the widget and add it to the viewport
-			GoodEndingWidgetInstance = CreateWidget<UUserWidget>(GetWorld(), GoodEndingWidgetClass);
-			if (GoodEndingWidgetInstance)
-			{
-				GoodEndingWidgetInstance->AddToViewport();
-			}
+			PhilosophersStone->Enable();
+			BroadcastOnItemInteracted("StoneCreated");
+		
 		}
 	}
 }

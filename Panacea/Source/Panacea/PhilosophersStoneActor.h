@@ -24,16 +24,29 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	virtual void Interact() override;
+
+	virtual void Broadcast() override;
 
 	UFUNCTION()
 	void Enable();
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	TSubclassOf<UUserWidget> EndingCutSceneWidgetClass;
+
+	UPROPERTY()
+	UUserWidget* EndingCutSceneWidget;
+
+	bool GetIsEnabled() const { return bEnabled; }
 
 private:
 	UPROPERTY()
 	UStaticMeshComponent* StoneMeshComponent;
 	UPROPERTY()
 	FVector InitialLocation;
+
+	UPROPERTY()
+	bool HasReadNote = false;
 
 	UPROPERTY(EditAnywhere)
 	float Speed = 10.0f;
@@ -44,8 +57,13 @@ private:
 	UPROPERTY(EditAnywhere)
 	bool bEnabled = false;
 
+	UPROPERTY(EditAnywhere)
+	bool bHasReachedDestination = false;
 
 	UFUNCTION()
 	void MoveStone(float DeltaTime);
+
+	UFUNCTION()
+	void NoteRead(const FString& itemInteracted);
 
 };

@@ -6,10 +6,12 @@
 
 #include "Blueprint/UserWidget.h"
 #include "Components/TextBlock.h"
+#include "DialogueRowBase.h"
 
 // Sets default values
 ADialogueManagerActor::ADialogueManagerActor()
 {
+	TimeShow = 15.0f;
 }
 
 // Called when the game starts or when spawned
@@ -56,25 +58,61 @@ void ADialogueManagerActor::BeginPlay()
 		UE_LOG(LogTemp, Error, TEXT("DialogueWidgetClass is null"));
 	}
 
+	Character = Cast<APanaceaCharacter>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
 }
 
 
 void ADialogueManagerActor::ShowDialogue(const FString& ItemName)
 {
-	//format message
-	const FText Message = FText::Format(FText::FromString("I am a kid and i just interacted with {0}"), FText::FromString(ItemName));
+    static const FString ContextString(TEXT("GENERAL"));
 
-	UE_LOG(LogTemp, Warning, TEXT("Should display dialogue: %s"), *Message.ToString());
+    if (!MyDataTable)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("DataTable is null"));
+        return;
+    }
 
-	DialogueTextBlock->SetText(Message);
+    FDialogueRowBase* row = MyDataTable->FindRow<FDialogueRowBase>(FName(ItemName), ContextString);
 
-	if (DialogueWidget)
-		DialogueWidget->SetVisibility(ESlateVisibility::Visible);
+    if (!row)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Row not found in DataTable"));
+        return;
+    }
 
+    if (DialogueTextBlock)
+    {
+        DialogueTextBlock->SetText(FText::FromString(row->source));
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("DialogueTextBlock is null"));
+        return;
+    }
 
-	FTimerHandle TimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]() {
-		DialogueWidget->SetVisibility(ESlateVisibility::Hidden);
-		}, 5.0f, false);
+    if (DialogueWidget)
+    {
+        DialogueWidget->SetVisibility(ESlateVisibility::Visible);
+    }
+
+    if (!Character)
+    {
+        UE_LOG(LogTemp, Error, TEXT("Owner is not of class APanaceaCharacter"));
+        return;
+    }
+
+    Character->TriggerSoundPlay(FName(row->SoundToPlay));
+
+    // Use a weak pointer to avoid potential crashes if the actor is destroyed
+    TWeakObjectPtr<ADialogueManagerActor> WeakThis(this);
+    GetWorld()->GetTimerManager().SetTimer(DialogueVisibilityTimerHandle, [WeakThis]()
+        {
+            if (WeakThis.IsValid())
+            {
+                if (WeakThis->DialogueWidget)
+                {
+                    WeakThis->DialogueWidget->SetVisibility(ESlateVisibility::Hidden);
+                }
+            }
+        }, TimeShow, false);
 }
-

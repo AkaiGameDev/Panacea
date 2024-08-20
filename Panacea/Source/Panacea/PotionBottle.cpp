@@ -2,11 +2,15 @@
 #include "MouseDragObjectsComponent.h"
 #include "SwitchComponent.h"
 #include "InteractiveComponent.h"
+#include "MetasoundSource.h"
+#include "Components/AudioComponent.h"
+#include "Sound/SoundBase.h"
 
 APotionBottle::APotionBottle()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	bIsBreaked = false;
+	bHasAmber = false;
 	BreakableDistance = 20.0f;
 
 	DefaultSceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("DefaultSceneRoot"));
@@ -23,7 +27,11 @@ APotionBottle::APotionBottle()
 
 	SwitchComponent = CreateDefaultSubobject<USwitchComponent>(TEXT("SwitchComponent"));
 	SwitchComponent->SetupAttachment(RootComponent);
+
+	MetaSoundAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("MetaSoundAudioComponent"));
+	MetaSoundAudioComponent->SetupAttachment(RootComponent);
 }
+
 
 void APotionBottle::BeginPlay()
 {
@@ -37,12 +45,36 @@ void APotionBottle::BeginPlay()
 	}
 
 	ACharacter* Character = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+	if (!Character)
+		return;
+	
 	UMouseDragObjectsComponent* MouseDragObjectsComponent = Character->GetComponentByClass<UMouseDragObjectsComponent>();
 
 	if (MouseDragObjectsComponent)
 	{
 		MouseDragObjectsComponent->OnComponentMouseRelease.AddDynamic(this, &APotionBottle::OnComponentReleased);
 	}
+
+	InteractiveComponent = Character->GetComponentByClass<UInteractiveComponent>();
+
+	if (MetaSoundSource)
+	{
+		MetaSoundAudioComponent->SetSound(MetaSoundSource);
+	}
+}
+
+void APotionBottle::Tick(float DeltaTime)
+{
+	if (!InteractiveComponent)
+		return;
+
+	if (InteractiveComponent->GetActorInFocus() != this)
+		return;
+
+	if (!InteractiveComponent->bIsHolding)
+		return;
+
+	OnComponentReleased(StaticMeshComponent);
 }
 
 void APotionBottle::OnComponentFracture(const FChaosBreakEvent& BreakEvent)
@@ -51,33 +83,35 @@ void APotionBottle::OnComponentFracture(const FChaosBreakEvent& BreakEvent)
 	{
 		bIsBreaked = true;
 
-		
-
 		Interact();
-
-		Broadcast();
 		SetNotInteractable();
-
-		ACharacter* Character = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
-		UInteractiveComponent* InteractiveComponent = Character->GetComponentByClass<UInteractiveComponent>();
 
 		if (InteractiveComponent)
 		{
 			InteractiveComponent->ResetActorInFocus(this);
 
-			if (ActorToSpawn)
-			{
 
+			if (MetaSoundAudioComponent)
+			{
+				MetaSoundAudioComponent->Play();
+			}
+
+			if (bHasAmber && ActorToSpawn)
+			{
+				Broadcast();
 				// Get the location and rotation of the current actor
 				FVector SpawnLocation = BreakEvent.Location;
 				FRotator SpawnRotation = GetActorRotation();
-
+				FActorSpawnParameters SpawnParams;
+				SpawnParams.Name = FName(TEXT("Amber"));
 				// Spawn the new actor
-				AItem* SpawnedActor = GetWorld()->SpawnActor<AItem>(ActorToSpawn, SpawnLocation, SpawnRotation);
-				
-				if(SpawnedActor)
+				AItem* SpawnedActor = GetWorld()->SpawnActor<AItem>(ActorToSpawn, SpawnLocation, SpawnRotation, SpawnParams);
+
+				if (SpawnedActor)
 				{
-					SpawnedActor->SetActorLabel("Amber");
+					#if WITH_EDITOR
+						SpawnedActor->SetActorLabel(TEXT("Amber"));
+					#endif
 
 					UStaticMeshComponent* MeshComponent = SpawnedActor->FindComponentByClass<UStaticMeshComponent>();
 					if (MeshComponent)
@@ -91,11 +125,6 @@ void APotionBottle::OnComponentFracture(const FChaosBreakEvent& BreakEvent)
 
 					SpawnedActor->Interactable = true;
 
-					/*APanaceaGameMode* GameMode = Cast<APanaceaGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-					if (GameMode)
-					{
-						GameMode->OnIngredientAdded.Broadcast(SpawnedActor->GetActorNameOrLabel());
-					}*/
 				}
 
 			}
@@ -109,17 +138,19 @@ void APotionBottle::OnComponentReleased(UPrimitiveComponent* ReleasedComponent)
 		return;
 	}
 
-	FVector Start = StaticMeshComponent->GetComponentLocation();
-	FVector End = Start - FVector(0.0f, 0.0f, BreakableDistance); 
-
 	FVector Origin, BoxBounds;
 	StaticMeshComponent->GetLocalBounds(Origin, BoxBounds);
 	FVector ActorScale = StaticMeshComponent->GetComponentScale();
-	FVector BoxExtent = BoxBounds * ActorScale; 
-
+	FVector BoxExtent = BoxBounds * ActorScale;
+	BoxExtent.X += 20.0f;
+	BoxExtent.Y += 20.0f;
+	BoxExtent.Z /= 2.0f;
 	FCollisionShape Box = FCollisionShape::MakeBox(BoxExtent);
 	FHitResult HitResult;
-
+	
+	FVector Start = StaticMeshComponent->GetComponentLocation();
+	Start.Z += BoxExtent.Z;
+	FVector End = Start - FVector(0.0f, 0.0f, BreakableDistance);
 
 	ACharacter* Character = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 	FCollisionQueryParams QueryParams;
@@ -168,6 +199,12 @@ void APotionBottle::Interact()
 	if (SwitchComponent)
 	{
 		SwitchComponent->SwitchCamera();
+	}
+
+
+	if (InteractiveComponent)
+	{
+		InteractiveComponent->bIsHolding = !InteractiveComponent->bIsHolding;
 	}
 
 	FirstInteraction();

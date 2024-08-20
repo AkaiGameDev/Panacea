@@ -39,7 +39,7 @@ void USwitchComponent::BeginPlay()
 
 	if (ObjectCamera)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Camera Found"));
+		/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Camera Found"));
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red,
 			FString::Printf(
 				TEXT("Camera Location: %s"),
@@ -47,7 +47,7 @@ void USwitchComponent::BeginPlay()
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red,
 			FString::Printf(
 				TEXT("Camera Rotation: %s"),
-				*ObjectCamera->GetRelativeRotation().ToString()));
+				*ObjectCamera->GetRelativeRotation().ToString()));*/
 	}
 }
 
@@ -57,7 +57,7 @@ void USwitchComponent::SwitchCamera()
 	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 	if (!PlayerController)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("PlayerController not found"));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("PlayerController not found"));
 		return;
 	}
 
@@ -67,14 +67,14 @@ void USwitchComponent::SwitchCamera()
 		{
 			PlayerController->SetViewTargetWithBlend(OriginalViewTarget, 0.5f, EViewTargetBlendFunction::VTBlend_Cubic);
 			OriginalViewTarget = nullptr;
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Switched back to original view"));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Switched back to original view"));
 		}
 	}
 	else
 	{
 		OriginalViewTarget = PlayerController->GetViewTarget();
 		PlayerController->SetViewTargetWithBlend(GetOwner(), 0.5f, EViewTargetBlendFunction::VTBlend_Cubic);
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Switched to object camera view"));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Switched to object camera view"));
 	}
 
 	ACharacter* Character = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
