@@ -47,6 +47,18 @@ public:
 	float BreakableDistance;
 
 	UPROPERTY(EditAnywhere)
+	float CheckBoxOnTickX;
+	
+	UPROPERTY(EditAnywhere)
+	float CheckBoxOnTickY;
+	
+	UPROPERTY(EditAnywhere)
+	float CheckBoxX;
+	
+	UPROPERTY(EditAnywhere)
+	float CheckBoxY;
+
+	UPROPERTY(EditAnywhere)
 	bool bHasAmber;
 
 	virtual void Tick(float DeltaTime) override;
@@ -58,7 +70,10 @@ private:
 	void OnComponentFracture(const FChaosBreakEvent& BreakEvent);
 
 	UFUNCTION()
-	void OnComponentReleased(UPrimitiveComponent* ReleasedComponent);
+	void OnComponentReleased(UPrimitiveComponent* ReleasedComponent, bool bOnTick = false);
+
+	UFUNCTION()
+	void OnComponentReleasedTrigger(UPrimitiveComponent* ReleasedComponent);
 
 	bool bIsBreaked;
 
