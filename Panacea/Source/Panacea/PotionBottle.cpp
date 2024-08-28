@@ -30,6 +30,11 @@ APotionBottle::APotionBottle()
 
 	MetaSoundAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("MetaSoundAudioComponent"));
 	MetaSoundAudioComponent->SetupAttachment(RootComponent);
+
+	CheckBoxOnTickX = 20.0f;
+	CheckBoxOnTickY = 20.0f;
+	CheckBoxX = -17.0f;
+	CheckBoxY = -17.0f;
 }
 
 
@@ -47,12 +52,12 @@ void APotionBottle::BeginPlay()
 	ACharacter* Character = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 	if (!Character)
 		return;
-	
+
 	UMouseDragObjectsComponent* MouseDragObjectsComponent = Character->GetComponentByClass<UMouseDragObjectsComponent>();
 
 	if (MouseDragObjectsComponent)
 	{
-		MouseDragObjectsComponent->OnComponentMouseRelease.AddDynamic(this, &APotionBottle::OnComponentReleased);
+		MouseDragObjectsComponent->OnComponentMouseRelease.AddDynamic(this, &APotionBottle::OnComponentReleasedTrigger);
 	}
 
 	InteractiveComponent = Character->GetComponentByClass<UInteractiveComponent>();
@@ -74,7 +79,7 @@ void APotionBottle::Tick(float DeltaTime)
 	if (!InteractiveComponent->bIsHolding)
 		return;
 
-	OnComponentReleased(StaticMeshComponent);
+	OnComponentReleased(StaticMeshComponent, true);
 }
 
 void APotionBottle::OnComponentFracture(const FChaosBreakEvent& BreakEvent)
@@ -109,9 +114,9 @@ void APotionBottle::OnComponentFracture(const FChaosBreakEvent& BreakEvent)
 
 				if (SpawnedActor)
 				{
-					#if WITH_EDITOR
-						SpawnedActor->SetActorLabel(TEXT("Amber"));
-					#endif
+#if WITH_EDITOR
+					SpawnedActor->SetActorLabel(TEXT("Amber"));
+#endif
 
 					UStaticMeshComponent* MeshComponent = SpawnedActor->FindComponentByClass<UStaticMeshComponent>();
 					if (MeshComponent)
@@ -132,7 +137,7 @@ void APotionBottle::OnComponentFracture(const FChaosBreakEvent& BreakEvent)
 	}
 }
 
-void APotionBottle::OnComponentReleased(UPrimitiveComponent* ReleasedComponent)
+void APotionBottle::OnComponentReleased(UPrimitiveComponent* ReleasedComponent, bool bOnTick /*= false*/)
 {
 	if (!Interactable) {
 		return;
@@ -142,12 +147,22 @@ void APotionBottle::OnComponentReleased(UPrimitiveComponent* ReleasedComponent)
 	StaticMeshComponent->GetLocalBounds(Origin, BoxBounds);
 	FVector ActorScale = StaticMeshComponent->GetComponentScale();
 	FVector BoxExtent = BoxBounds * ActorScale;
-	BoxExtent.X += 20.0f;
-	BoxExtent.Y += 20.0f;
+
+	if (bOnTick) {
+		BoxExtent.X += CheckBoxOnTickX;
+		BoxExtent.Y += CheckBoxOnTickY;
+	}
+	else
+	{
+		BoxExtent.X += CheckBoxY;
+		BoxExtent.Y += CheckBoxY;
+	}
+
 	BoxExtent.Z /= 2.0f;
+
 	FCollisionShape Box = FCollisionShape::MakeBox(BoxExtent);
 	FHitResult HitResult;
-	
+
 	FVector Start = StaticMeshComponent->GetComponentLocation();
 	Start.Z += BoxExtent.Z;
 	FVector End = Start - FVector(0.0f, 0.0f, BreakableDistance);
@@ -167,6 +182,7 @@ void APotionBottle::OnComponentReleased(UPrimitiveComponent* ReleasedComponent)
 		QueryParams
 	);
 
+
 	/*DrawDebugBox(GetWorld(), Start, BoxExtent, FColor::Red, false, 1.0f);
 	DrawDebugBox(GetWorld(), End, BoxExtent, FColor::Green, false, 1.0f);
 	DrawDebugLine(GetWorld(), Start, End, FColor::Blue, false, 1.0f, 0, 1.0f);*/
@@ -184,6 +200,11 @@ void APotionBottle::OnComponentReleased(UPrimitiveComponent* ReleasedComponent)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Potion bottle is too low to break."));
 	}
+}
+
+void APotionBottle::OnComponentReleasedTrigger(UPrimitiveComponent* ReleasedComponent)
+{
+	OnComponentReleased(ReleasedComponent);
 }
 
 void APotionBottle::Interact()
